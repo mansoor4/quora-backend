@@ -8,7 +8,7 @@ const express = require("express"),
 // Global Middlewares
 app.use(express.json());
 app.use(cors());
-app.use(helmet());
+// app.use(helmet());
 
 //Import Routes
 const authRoute = require("./routes/auth");
