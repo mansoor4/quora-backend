@@ -3,7 +3,6 @@ const User = require("../models/user"),
   error = require("../utils/error"),
   jwt = require("jsonwebtoken"),
   environmentVariables = require("../config/environmentVariables"),
-  querystring = require("query-string"),
   axios = require("axios");
 
 //Configure Environment variables
@@ -13,7 +12,7 @@ environmentVariables();
 module.exports = {
   signup: async (req, res, next) => {
     try {
-      let { username, email, password, branch, year } = req.body;
+      let { username, email, password } = req.body;
 
       const salt = randomBytes(16).toString("hex");
 
@@ -29,22 +28,14 @@ module.exports = {
 
       const user = await User.create({
         username: username,
-        branch: branch,
-        year: year,
         email: email,
         password: password,
         salt: salt,
-        profileImage: req.file
-          ? {
-              path:
-                process.env.DOMAIN +
-                "/api/user/getImage" +
-                "/" +
-                req.file.filename,
-              originalName: req.file.originalname,
-              size: req.file.size,
-            }
-          : null,
+        profileImage: {
+          path: null,
+          originalName: null,
+          size: null,
+        },
       });
       if (!user) {
         throw error("User not created", 500);
@@ -93,9 +84,32 @@ module.exports = {
         }
       );
 
-      console.log(userData.data);
+      const { email, verified_email, name, picture } = userData.data;
+      let user = await User.findOne({ email: email });
+      if (!user) {
+        user = await User.create({
+          email: email,
+          username: name,
+          emailVerify: verified_email,
+          profileImage: {
+            path: picture,
+            originalName: null,
+            size: null,
+          },
+        });
+        if (!user) {
+          throw error("User not created", 500);
+        }
+      }
+      const token = jwt.sign(
+        { id: user._id, email: email },
+        process.env.SECRET
+      );
+
       return res.json({
-        message: "Done",
+        token: token,
+        userId: user._id,
+        message: "Signin Sucessfully",
       });
     } catch (err) {
       return next(err);
