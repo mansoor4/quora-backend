@@ -27,7 +27,7 @@ const signinValidation = async (req, res, next) => {
     if (!user) {
       throw error("You are not register, goto signup and register", 422);
     }
-    if (password === null) {
+    if (user.password === null) {
       throw error(
         "You are signin with google login, reset password to sign in without google login",
         422
