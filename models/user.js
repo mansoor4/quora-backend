@@ -9,19 +9,20 @@ const userSchema = new mongoose.Schema(
     branch: {
       type: String,
       enum: [
-        "C.S.E",
-        "I.T",
+        "None",
+        "Computer Science & Engineering",
+        "Information Technology",
+        "Electronics & Telecommunication",
         "Electrical",
         "Mechanical",
         "Civil",
-        "Electronics",
-        "NONE",
+        "Instrumentation",
       ],
       default: null,
     },
     year: {
       type: String,
-      enum: ["1st", "2nd", "3rd", "4th", "NONE"],
+      enum: ["1st", "2nd", "3rd", "4th", "None"],
       default: null,
     },
     email: {
