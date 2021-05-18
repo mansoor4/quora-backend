@@ -64,6 +64,7 @@ module.exports = {
       return res.json({
         token: token,
         userId: user._id,
+        profilePath: null,
         message: "Signin Sucessfully",
       });
     } catch (err) {
@@ -109,6 +110,7 @@ module.exports = {
       return res.json({
         token: token,
         userId: user._id,
+        profilePath: picture,
         message: "Signin Sucessfully",
       });
     } catch (err) {
