@@ -37,11 +37,20 @@ module.exports = {
           size: null,
         },
       });
+
       if (!user) {
         throw error("User not created", 500);
       }
+
+      const token = jwt.sign(
+        { id: user._id, email: email },
+        process.env.SECRET
+      );
+
       return res.json({
+        token: token,
         userId: user._id,
+        profilePath: null,
         message: "Signup Successfully",
       });
     } catch (err) {
