@@ -1,4 +1,4 @@
-const { trim, isEmpty, isEmail, normalizeEmail } = require("validator"),
+const { isEmpty, isEmail, normalizeEmail } = require("validator"),
   error = require("../utils/error"),
   User = require("../models/user"),
   { pbkdf2Sync } = require("crypto");
@@ -26,6 +26,12 @@ const signinValidation = async (req, res, next) => {
     const user = await User.findOne({ email: email });
     if (!user) {
       throw error("You are not register, goto signup and register", 422);
+    }
+    if (password === null) {
+      throw error(
+        "You are signin with google login, reset password to sign in without google login",
+        422
+      );
     }
     const hashPassword = pbkdf2Sync(
       password,

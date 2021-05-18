@@ -1,13 +1,5 @@
-const {
-    trim,
-    isEmpty,
-    isEmail,
-    normalizeEmail,
-    isLength,
-  } = require("validator"),
+const { isEmpty, isEmail, normalizeEmail, isLength } = require("validator"),
   error = require("../utils/error"),
-  fs = require("fs"),
-  path = require("path"),
   User = require("../models/user");
 
 const signupValidation = async (req, res, next) => {
@@ -41,9 +33,6 @@ const signupValidation = async (req, res, next) => {
     }
     return next();
   } catch (err) {
-    if (req.file) {
-      fs.unlinkSync(path.join(__dirname, "..", "uploads", req.file.filename));
-    }
     return next(err);
   }
 };
