@@ -36,6 +36,7 @@ app.use("/", (error, req, res, next) => {
   return res.status(status).json({
     error: error,
     message: message,
+    status: status,
   });
 });
 
