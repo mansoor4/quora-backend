@@ -18,12 +18,12 @@ const userSchema = new mongoose.Schema(
         "Civil",
         "Instrumentation",
       ],
-      default: null,
+      default: "None",
     },
     year: {
       type: String,
       enum: ["1st", "2nd", "3rd", "4th", "None"],
-      default: null,
+      default: "None",
     },
     email: {
       type: String,
