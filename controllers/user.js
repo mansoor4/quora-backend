@@ -34,6 +34,7 @@ module.exports = {
         branch,
         year,
         contact,
+        profileCompleted: true,
         profileImage: req.file
           ? {
               path:
@@ -57,5 +58,8 @@ module.exports = {
     } catch (err) {
       return next(err);
     }
+  },
+  updateProfile: (req, res, next) => {
+    const user = req.profile;
   },
 };

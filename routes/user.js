@@ -2,7 +2,11 @@ const express = require("express"),
   router = express.Router();
 
 //Importing Controllers
-const { getImage, createProfile } = require("../controllers/user");
+const {
+  getImage,
+  createProfile,
+  updateProfile,
+} = require("../controllers/user");
 
 //Importing Middlewares
 const multerUpload = require("../middleware/multerUpload"),
@@ -20,7 +24,12 @@ router.post(
   multerUpload,
   createProfile
 );
-
+router.post(
+  "/updateProfile/:userId",
+  isAuthenticated,
+  multerUpload,
+  updateProfile
+);
 //GET
 router.get("/getImage/:imageName", getImage);
 
