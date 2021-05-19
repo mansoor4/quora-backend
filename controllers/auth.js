@@ -74,6 +74,7 @@ module.exports = {
         token: token,
         userId: user._id,
         profilePath: null,
+        profileCompleted: user.profileCompleted,
         message: "Signin Sucessfully",
       });
     } catch (err) {
@@ -120,6 +121,7 @@ module.exports = {
         token: token,
         userId: user._id,
         profilePath: picture,
+        profileCompleted: user.profileCompleted,
         message: "Signin Sucessfully",
       });
     } catch (err) {
