@@ -145,7 +145,7 @@ module.exports = {
 
   createQuestion: async (req, res, next) => {
     try {
-      let { title, body } = req.body;
+      let { title, body, tags } = req.body;
       const { userId } = req.params;
       const user = req.profile;
       title = title.trim();
