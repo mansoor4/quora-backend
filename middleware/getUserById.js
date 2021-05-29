@@ -3,7 +3,7 @@ const User = require("../models/user"),
 
 const getUserById = async (req, res, next, id) => {
   try {
-    const user = await User.findOne({ _id: id });
+    const user = await User.findOne({ _id: id }).select("-password -salt");
     if (!user) {
       throw error("User not found", 404);
     }

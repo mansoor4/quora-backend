@@ -6,7 +6,7 @@ const answerSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -16,8 +16,16 @@ const answerSchema = new mongoose.Schema(
       ref: "Question",
       required: true,
     },
+    upVote: {
+      type: Number,
+      default: 0,
+    },
+    downVote: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
 
-module.exports = new mongoose.model("Answer", answerSchema);
+module.exports = mongoose.model("Answer", answerSchema);

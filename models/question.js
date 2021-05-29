@@ -10,14 +10,29 @@ const questionSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    upVote: {
+      type: Number,
+      default: 0,
+    },
+    downVote: {
+      type: Number,
+      default: 0,
+    },
+    Views: {
+      type: Number,
+      default: 0,
+    },
+    tags: {
+      type: Array,
     },
     answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
   },
   { timestamps: true }
 );
 
-module.exports = new mongoose.model("Question", questionSchema);
+module.exports = mongoose.model("Question", questionSchema);

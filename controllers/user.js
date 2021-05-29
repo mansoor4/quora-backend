@@ -3,7 +3,9 @@ const fs = require("fs"),
   error = require("../utils/error"),
   _ = require("lodash"),
   environmentVariables = require("../config/environmentVariables"),
-  Question = require("../models/question");
+  Question = require("../models/question"),
+  Answer = require("../models/answer"),
+  User = require("../models/user");
 
 //Configure Environment variables
 environmentVariables();
@@ -107,18 +109,52 @@ module.exports = {
       return next(err);
     }
   },
-  getUser: (req, res, next) => {
-    return res.json({
-      user: req.profile,
-    });
+  getUser: async (req, res, next) => {
+    try {
+      const user = req.profile;
+      const populatedUser = await user
+        .populate({
+          path: "questions",
+          model: Question,
+          select: "-body -user",
+        })
+        .populate({
+          path: "answers",
+          model: Answer,
+          select: "question",
+          populate: {
+            path: "question",
+            model: Question,
+            select: "title user ",
+            populate: {
+              path: "user",
+              model: User,
+              select: "username profileImage.path",
+            },
+          },
+        })
+        .execPopulate();
+
+      return res.json({
+        user: populatedUser,
+      });
+    } catch (err) {
+      return next(err);
+    }
   },
 
   createQuestion: async (req, res, next) => {
     try {
       let { title, body } = req.body;
+      const { userId } = req.params;
       const user = req.profile;
       title = title.trim();
-      const question = await Question.create({ title, body, userId: user._id });
+      const question = await Question.create({
+        title,
+        body,
+        user: userId,
+        tags,
+      });
       if (!question) {
         throw error("Question not created", 500);
       }
@@ -130,6 +166,68 @@ module.exports = {
 
       return res.json({
         message: "Question created successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  getQuestion: async (req, res, next) => {
+    try {
+      const question = req.question;
+      const populatedQuestion = await question
+        .populate({
+          path: "user",
+          model: User,
+          select: "username profileImage.path",
+        })
+        .populate({
+          path: "answers",
+          model: Answer,
+          select: "-question",
+          populate: {
+            path: "user",
+            model: User,
+            select: "username profileImage.path",
+          },
+        })
+        .execPopulate();
+
+      return res.json({
+        question: populatedQuestion,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  createAnswer: async (req, res, next) => {
+    try {
+      const { body } = req.body;
+      const { userId, questionId } = req.params;
+      const user = req.profile;
+      const question = req.question;
+      const answer = await Answer.create({
+        body,
+        user: userId,
+        question: questionId,
+      });
+      if (!answer) {
+        throw error("Answer not crated", 500);
+      }
+      user.answers.push(answer);
+      question.answers.push(answer);
+
+      const saveUser = await user.save();
+      if (!saveUser) {
+        throw error("user not saved");
+      }
+
+      const saveQuestion = await question.save();
+      if (!saveQuestion) {
+        throw error("Question not saved");
+      }
+
+      return res.json({
+        message: "Answer created successfully",
       });
     } catch (err) {
       return next(err);

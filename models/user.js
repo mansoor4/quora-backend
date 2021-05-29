@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    numberVerify: {
+    contactVerify: {
       type: Boolean,
       default: false,
     },
