@@ -6,6 +6,7 @@ const {
   getImage,
   createProfile,
   updateProfile,
+  getUser,
 } = require("../controllers/user");
 
 //Importing Middlewares
@@ -30,7 +31,10 @@ router.post(
   multerUpload,
   updateProfile
 );
+
+router.post("/createQuestion/:userId",isAuthenticated)
 //GET
 router.get("/getImage/:imageName", getImage);
+router.get("/getUser/:userId", isAuthenticated, getUser);
 
 module.exports = router;

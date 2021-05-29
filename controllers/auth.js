@@ -34,6 +34,7 @@ module.exports = {
         profileImage: {
           path: null,
           originalName: null,
+          fileName: null,
           size: null,
         },
       });
@@ -105,6 +106,7 @@ module.exports = {
           profileImage: {
             path: picture,
             originalName: null,
+            fileName:null,
             size: null,
           },
         });

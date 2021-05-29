@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
       enum: ["1st", "2nd", "3rd", "4th", "None"],
       default: "None",
     },
+    college: {
+      type: String,
+      default: null,
+      lowercase: true,
+    },
     email: {
       type: String,
       required: true,
@@ -44,6 +49,10 @@ const userSchema = new mongoose.Schema(
           default: null,
         },
         originalName: {
+          type: String,
+          default: null,
+        },
+        fileName: {
           type: String,
           default: null,
         },
@@ -70,6 +79,8 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
+    questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }],
   },
   { timestamps: true }
 );

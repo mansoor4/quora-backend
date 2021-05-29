@@ -2,7 +2,8 @@ const fs = require("fs"),
   path = require("path"),
   error = require("../utils/error"),
   _ = require("lodash"),
-  environmentVariables = require("../config/environmentVariables");
+  environmentVariables = require("../config/environmentVariables"),
+  Question = require("../models/question");
 
 //Configure Environment variables
 environmentVariables();
@@ -28,11 +29,14 @@ module.exports = {
 
   createProfile: async (req, res, next) => {
     try {
-      const { branch, year, contact } = req.body;
+      let { branch, year, contact, college } = req.body;
+      college = college.trim();
+      contact = contact.trim();
       let user = req.profile;
       user = _.extend(user, {
         branch,
         year,
+        college,
         contact,
         profileCompleted: true,
         profileImage: req.file
@@ -43,6 +47,7 @@ module.exports = {
                 "/" +
                 req.file.filename,
               originalName: req.file.originalname,
+              fileName: req.file.filename,
               size: req.file.size,
             }
           : null,
@@ -59,7 +64,75 @@ module.exports = {
       return next(err);
     }
   },
-  updateProfile: (req, res, next) => {
-    const user = req.profile;
+  updateProfile: async (req, res, next) => {
+    try {
+      let user = req.profile;
+      let { branch, year, username, college } = req.body;
+      username = username.trim();
+      college = college.trim();
+      let profile = { branch, year, username, college };
+
+      if (req.file) {
+        if (!(req.file.originalname === user.profileImage.originalName)) {
+          profile = {
+            ...profile,
+            profileImage: {
+              path:
+                process.env.DOMAIN +
+                "/api/user/getImage" +
+                "/" +
+                req.file.filename,
+              originalName: req.file.originalname,
+              fileName: req.file.filename,
+              size: req.file.size,
+            },
+          };
+        }
+        if (user.profileImage.fileName) {
+          fs.unlinkSync(
+            path.join(__dirname, "..", "uploads", user.profileImage.fileName)
+          );
+        }
+      }
+
+      user = _.extend(user, profile);
+      const saveUser = await user.save();
+      if (!saveUser) {
+        throw error("User not saved", 500);
+      }
+      return res.json({
+        message: "Profile Updated Sucessfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  getUser: (req, res, next) => {
+    return res.json({
+      user: req.profile,
+    });
+  },
+
+  createQuestion: async (req, res, next) => {
+    try {
+      let { title, body } = req.body;
+      const user = req.profile;
+      title = title.trim();
+      const question = await Question.create({ title, body, userId: user._id });
+      if (!question) {
+        throw error("Question not created", 500);
+      }
+      user.questions.push(question);
+      const saveUser = await user.save();
+      if (!saveUser) {
+        throw error("User not saved", 500);
+      }
+
+      return res.json({
+        message: "Question created successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
   },
 };

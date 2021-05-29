@@ -11,7 +11,6 @@ const isAuthenticated = (req, res, next) => {
     if (!authorization) {
       throw error("You are not Authorized", 400);
     }
-    console.log(authorization);
     const token = authorization.split(" ")[1];
     if (!token) {
       throw error("You are not Authorized", 400);
@@ -20,7 +19,6 @@ const isAuthenticated = (req, res, next) => {
     if (!decode) {
       throw error("You are not Authorized", 400);
     }
-    console.log(decode);
     req.userId = decode.id;
     return next();
   } catch (err) {
