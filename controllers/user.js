@@ -233,4 +233,10 @@ module.exports = {
       return next(err);
     }
   },
+
+  imageUpload: (req, res, next) => {
+    return res.json({
+      url: process.env.DOMAIN + "/api/user/getImage" + "/" + req.file.filename,
+    });
+  },
 };
