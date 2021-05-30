@@ -10,7 +10,6 @@ const {
   createQuestion,
   getQuestion,
   createAnswer,
-  imageUpload,
 } = require("../controllers/user");
 
 //Importing Middlewares
@@ -18,7 +17,6 @@ const multerUpload = require("../middleware/multerUpload"),
   getUserById = require("../middleware/getUserById"),
   getQuestionById = require("../middleware/getQuestionById"),
   isAuthenticated = require("../middleware/isAuthenticated");
-const { route } = require("./auth");
 
 //Params Middlewares
 router.param("userId", getUserById);
@@ -39,11 +37,14 @@ router.post(
   updateProfile
 );
 
-router.post("/createQuestion/:userId", isAuthenticated, createQuestion);
+router.post(
+  "/createQuestion/:userId",
+  isAuthenticated,
+  multerUpload,
+  createQuestion
+);
 
 router.post("/createAnswer/:userId/:questionId", isAuthenticated, createAnswer);
-
-router.post("/image", multerUpload, imageUpload);
 
 //GET
 router.get("/getImage/:imageName", getImage);

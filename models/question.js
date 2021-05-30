@@ -29,6 +29,7 @@ const questionSchema = new mongoose.Schema(
     },
     tags: {
       type: Array,
+      default: [],
     },
     answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
   },

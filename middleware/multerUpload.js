@@ -3,7 +3,7 @@ const upload = require("../config/multer"),
   error = require("../utils/error");
 
 multerUpload = (req, res, next) => {
-  upload.single("image")(req, res, (err) => {
+  upload.array("image")(req, res, (err) => {
     const now = err && err.code == "UnknownEndpoint" ? true : false;
 
     // internet disconnect

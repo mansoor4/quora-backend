@@ -41,16 +41,16 @@ module.exports = {
         college,
         contact,
         profileCompleted: true,
-        profileImage: req.file
+        profileImage: req.files[0]
           ? {
               path:
                 process.env.DOMAIN +
                 "/api/user/getImage" +
                 "/" +
-                req.file.filename,
-              originalName: req.file.originalname,
-              fileName: req.file.filename,
-              size: req.file.size,
+                req.files[0].filename,
+              originalName: req.files[0].originalname,
+              fileName: req.files[0].filename,
+              size: req.files[0].size,
             }
           : null,
       });
@@ -74,8 +74,8 @@ module.exports = {
       college = college.trim();
       let profile = { branch, year, username, college };
 
-      if (req.file) {
-        if (!(req.file.originalname === user.profileImage.originalName)) {
+      if (req.files[0]) {
+        if (!(req.files[0].originalname === user.profileImage.originalName)) {
           profile = {
             ...profile,
             profileImage: {
@@ -83,10 +83,10 @@ module.exports = {
                 process.env.DOMAIN +
                 "/api/user/getImage" +
                 "/" +
-                req.file.filename,
-              originalName: req.file.originalname,
-              fileName: req.file.filename,
-              size: req.file.size,
+                req.files[0].filename,
+              originalName: req.files[0].originalname,
+              fileName: req.files[0].filename,
+              size: req.files[0].size,
             },
           };
         }
@@ -149,6 +149,29 @@ module.exports = {
       const { userId } = req.params;
       const user = req.profile;
       title = title.trim();
+      const fileImages = req.files.map((file) => {
+        return file.originalname;
+      });
+      const bodyImages = body.map((item) => {
+        if (item.insert.image) {
+          const filePath = item.insert.image.split("/");
+          return filePath[filePath.length - 1];
+        }
+      });
+
+      const includedImages = fileImages.filter((image) => {
+        return bodyImages.indexOf(image) != -1;
+      });
+
+      const excludedImages = fileImages.filter((image) => {
+        return bodyImages.indexOf(image) == -1;
+      });
+
+      console.log("Included Images\n");
+      console.log(includedImages);
+      console.log("Excluded Images\n");
+      console.log(excludedImages);
+
       const question = await Question.create({
         title,
         body,
@@ -192,6 +215,9 @@ module.exports = {
         })
         .execPopulate();
 
+      if (!populatedQuestion) {
+        throw error("Question not saved", 500);
+      }
       return res.json({
         question: populatedQuestion,
       });
@@ -232,11 +258,5 @@ module.exports = {
     } catch (err) {
       return next(err);
     }
-  },
-
-  imageUpload: (req, res, next) => {
-    return res.json({
-      url: process.env.DOMAIN + "/api/user/getImage" + "/" + req.file.filename,
-    });
   },
 };
