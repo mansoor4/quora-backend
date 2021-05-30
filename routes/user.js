@@ -22,20 +22,30 @@ const multerUpload = require("../middleware/multerUpload"),
 router.param("userId", getUserById);
 router.param("questionId", getQuestionById);
 //Routers
-router.use("/:apiName/:id", isAuthenticated);
+
 //POST
-router.post("/createProfile/:userId", multerUpload, createProfile);
-router.post("/updateProfile/:userId", multerUpload, updateProfile);
+router.post(
+  "/createProfile/:userId",
+  isAuthenticated,
+  multerUpload,
+  createProfile
+);
+router.post(
+  "/updateProfile/:userId",
+  isAuthenticated,
+  multerUpload,
+  updateProfile
+);
 
-router.post("/createQuestion/:userId", createQuestion);
+router.post("/createQuestion/:userId", isAuthenticated, createQuestion);
 
-router.post("/createAnswer/:userId/:questionId", createAnswer);
+router.post("/createAnswer/:userId/:questionId", isAuthenticated, createAnswer);
 
 //GET
 router.get("/getImage/:imageName", getImage);
 
-router.get("/getUser/:userId", getUser);
+router.get("/getUser/:userId", isAuthenticated, getUser);
 
-router.get("/getQuestion/:questionId", getQuestion);
+router.get("/getQuestion/:questionId", isAuthenticated, getQuestion);
 
 module.exports = router;
