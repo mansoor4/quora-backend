@@ -152,6 +152,9 @@ module.exports = {
       const fileImages = req.files.map((file) => {
         return file.originalname;
       });
+
+      body = JSON.parse(body);
+      tags = JSON.parse(tags);
       const bodyImages = body.map((item) => {
         if (item.insert.image) {
           const filePath = item.insert.image.split("/");
