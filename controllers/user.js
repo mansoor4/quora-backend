@@ -150,11 +150,17 @@ module.exports = {
       const user = req.profile;
       title = title.trim();
 
+      const updatedBody = body.filter((item) => {
+        if (item.insert) {
+          return item.insert.image != process.env.IMAGE_PLACEHOLDER;
+        }
+      });
+
       const question = await Question.create({
-        title,
-        body,
+        title: title,
+        body: updatedBody,
         user: userId,
-        tags,
+        tags: tags,
       });
       if (!question) {
         throw error("Question not created", 500);
@@ -172,32 +178,46 @@ module.exports = {
       return next(err);
     }
   },
+
   questionImagesUplaod: (req, res, next) => {
-    body = JSON.parse(body);
-    tags = JSON.parse(tags);
-    const fileImages = req.files.map((file) => {
-      return file.originalname;
-    });
-    const bodyImages = body.map((item) => {
-      if (item.insert.image) {
-        const filePath = item.insert.image.split("/");
-        return filePath[filePath.length - 1];
-      }
-    });
-    const includedImages = fileImages.filter((image) => {
-      return bodyImages.indexOf(image) != -1;
-    });
+    try {
+      const question = req.question;
+      const { body } = question;
 
-    const excludedImages = fileImages.filter((image) => {
-      return bodyImages.indexOf(image) == -1;
-    });
+      const fileImages = req.files.map((file) => {
+        return file.originalname;
+      });
 
-    console.log("Included Images\n");
-    console.log(includedImages);
-    console.log("Excluded Images\n");
-    console.log(excludedImages);
-    X;
+      const bodyImages = body.map((item) => {
+        if (item.insert) {
+          if (item.insert.image) {
+            const filePath = item.insert.image.split("/");
+            return filePath[filePath.length - 1];
+          }
+        }
+      });
+
+      const includedImages = fileImages.filter((image) => {
+        return bodyImages.indexOf(image) != -1;
+      });
+
+      const excludedImages = fileImages.filter((image) => {
+        return bodyImages.indexOf(image) == -1;
+      });
+
+      console.log("Included Images\n");
+      console.log(includedImages);
+      console.log("Excluded Images\n");
+      console.log(excludedImages);
+
+      return res.json({
+        message: "Done",
+      });
+    } catch (err) {
+      return next(err);
+    }
   },
+
   getQuestion: async (req, res, next) => {
     try {
       const question = req.question;
