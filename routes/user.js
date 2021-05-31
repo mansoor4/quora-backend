@@ -42,6 +42,7 @@ router.post("/createQuestion/:userId", isAuthenticated, createQuestion);
 router.post(
   "/questionImagesUplaod/:questionId",
   isAuthenticated,
+  multerUpload,
   questionImagesUplaod
 );
 router.post("/createAnswer/:userId/:questionId", isAuthenticated, createAnswer);

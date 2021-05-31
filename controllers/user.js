@@ -5,7 +5,8 @@ const fs = require("fs"),
   environmentVariables = require("../config/environmentVariables"),
   Question = require("../models/question"),
   Answer = require("../models/answer"),
-  User = require("../models/user");
+  User = require("../models/user"),
+  deleteImages = require("../utils/deleteImages.js");
 
 //Configure Environment variables
 environmentVariables();
@@ -179,12 +180,13 @@ module.exports = {
     }
   },
 
-  questionImagesUplaod: (req, res, next) => {
+  questionImagesUplaod: async (req, res, next) => {
     try {
       const question = req.question;
       const { body } = question;
+      const multerFiles = req.files;
 
-      const fileImages = req.files.map((file) => {
+      const fileImages = multerFiles.map((file) => {
         return file.originalname;
       });
 
@@ -195,6 +197,7 @@ module.exports = {
             return filePath[filePath.length - 1];
           }
         }
+        return "";
       });
 
       const includedImages = fileImages.filter((image) => {
@@ -205,13 +208,47 @@ module.exports = {
         return bodyImages.indexOf(image) == -1;
       });
 
-      console.log("Included Images\n");
-      console.log(includedImages);
-      console.log("Excluded Images\n");
-      console.log(excludedImages);
+      const excludedFilenames = excludedImages.map((item) => {
+        for (let i = 0; i < multerFiles.length; i++) {
+          if (multerFiles[i].originalname === item) {
+            return multerFiles[i].filename;
+          }
+        }
+      });
 
+      const includedFilenames = includedImages.map((item) => {
+        for (let i = 0; i < multerFiles.length; i++) {
+          if (multerFiles[i].originalname === item) {
+            return multerFiles[i].filename;
+          }
+        }
+      });
+
+      let i = 0;
+      const updatedBody = body.map((item) => {
+        if (item.insert) {
+          if (item.insert.image) {
+            item.insert.image =
+              process.env.DOMAIN +
+              "/api/user/getImage" +
+              "/" +
+              includedFilenames[i];
+            i++;
+          }
+        }
+        return item;
+      });
+
+      question.body = updatedBody;
+
+      deleteImages(excludedFilenames);
+
+      const saveQuestion = await question.save();
+      if (!saveQuestion) {
+        throw error("Question not saved");
+      }
       return res.json({
-        message: "Done",
+        message: "Question created successfully",
       });
     } catch (err) {
       return next(err);
