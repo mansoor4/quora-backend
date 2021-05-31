@@ -8,6 +8,7 @@ const {
   updateProfile,
   getUser,
   createQuestion,
+  questionImagesUplaod,
   getQuestion,
   createAnswer,
 } = require("../controllers/user");
@@ -37,13 +38,12 @@ router.post(
   updateProfile
 );
 
+router.post("/createQuestion/:userId", isAuthenticated, createQuestion);
 router.post(
-  "/createQuestion/:userId",
+  "/questionImagesUplaod/:questionId",
   isAuthenticated,
-  multerUpload,
-  createQuestion
+  questionImagesUplaod
 );
-
 router.post("/createAnswer/:userId/:questionId", isAuthenticated, createAnswer);
 
 //GET

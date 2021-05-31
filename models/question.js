@@ -8,7 +8,7 @@ const questionSchema = new mongoose.Schema(
     },
     body: {
       type: Array,
-      required: true,
+      default: [],
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
