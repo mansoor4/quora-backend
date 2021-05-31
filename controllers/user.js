@@ -173,7 +173,7 @@ module.exports = {
       }
 
       return res.json({
-        message: "Question created successfully",
+        questionId: question._id,
       });
     } catch (err) {
       return next(err);
