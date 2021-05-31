@@ -155,6 +155,7 @@ module.exports = {
         if (item.insert) {
           return item.insert.image != process.env.IMAGE_PLACEHOLDER;
         }
+        return true;
       });
 
       const question = await Question.create({
@@ -247,6 +248,7 @@ module.exports = {
       if (!saveQuestion) {
         throw error("Question not saved");
       }
+
       return res.json({
         message: "Question created successfully",
       });
