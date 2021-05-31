@@ -155,7 +155,7 @@ module.exports = {
         if (item.insert) {
           return item.insert.image != process.env.IMAGE_PLACEHOLDER;
         }
-        return true;
+        return false;
       });
 
       const question = await Question.create({
