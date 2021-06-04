@@ -243,7 +243,7 @@ module.exports = {
       });
 
       let i = 0;
-      const updatedBody = body.map((item) => {
+      question.body = body.map((item) => {
         if (item.insert) {
           if (
             item.insert.image &&
@@ -256,15 +256,13 @@ module.exports = {
               includedFilenames[i];
             i++;
           }
-          return item;
+          return _.cloneDeep(item);
         }
       });
 
-      question.body = updatedBody;
-
       deleteImages(excludedFilenames);
 
-      const saveQuestion = await question.markModified('body');
+      const saveQuestion = await question.save();
       if (!saveQuestion) {
         throw error("Question not saved");
       }
