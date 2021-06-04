@@ -184,8 +184,7 @@ module.exports = {
   updateQuestion: (req, res, next) => {
     try {
       let { title, body, tags } = req.body;
-      const { userId } = req.params;
-      const user = req.profile;
+      const question = req.question;
       title = title.trim();
 
       const updatedBody = body.filter((item) => {
@@ -246,7 +245,10 @@ module.exports = {
       let i = 0;
       const updatedBody = body.map((item) => {
         if (item.insert) {
-          if (item.insert.image) {
+          if (
+            item.insert.image &&
+            item.insert.image.split("/")[0] !== process.env.DOMAIN
+          ) {
             item.insert.image =
               process.env.DOMAIN +
               "/api/user/getImage" +
@@ -254,9 +256,11 @@ module.exports = {
               includedFilenames[i];
             i++;
           }
+          return item;
         }
-        return item;
       });
+
+      console.log(updatedBody);
 
       question.body = updatedBody;
 
