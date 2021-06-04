@@ -260,13 +260,11 @@ module.exports = {
         }
       });
 
-      console.log(updatedBody);
-
       question.body = updatedBody;
 
       deleteImages(excludedFilenames);
 
-      const saveQuestion = await question.save();
+      const saveQuestion = await question.markModified('body');
       if (!saveQuestion) {
         throw error("Question not saved");
       }
