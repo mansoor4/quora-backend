@@ -181,7 +181,25 @@ module.exports = {
     }
   },
 
-  questionImagesUplaod: async (req, res, next) => {
+  updateQuestion: (req, res, next) => {
+    try {
+      let { title, body, tags } = req.body;
+      const { userId } = req.params;
+      const user = req.profile;
+      title = title.trim();
+
+      const updatedBody = body.filter((item) => {
+        if (item.insert) {
+          return item.insert.image != process.env.IMAGE_PLACEHOLDER;
+        }
+        return false;
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  questionImagesUpload: async (req, res, next) => {
     try {
       const question = req.question;
       const { body } = question;

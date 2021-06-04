@@ -8,7 +8,8 @@ const {
   updateProfile,
   getUser,
   createQuestion,
-  questionImagesUplaod,
+  updateQuestion,
+  questionImagesUpload,
   getQuestion,
   createAnswer,
 } = require("../controllers/user");
@@ -39,12 +40,20 @@ router.post(
 );
 
 router.post("/createQuestion/:userId", isAuthenticated, createQuestion);
+
 router.post(
-  "/questionImagesUplaod/:questionId",
+  "/updateQuestion/:userId/:questionId",
+  isAuthenticated,
+  updateQuestion
+);
+
+router.post(
+  "/questionImagesUpload/:userId/:questionId",
   isAuthenticated,
   multerUpload,
-  questionImagesUplaod
+  questionImagesUpload
 );
+
 router.post("/createAnswer/:userId/:questionId", isAuthenticated, createAnswer);
 
 //GET

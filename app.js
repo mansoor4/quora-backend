@@ -19,10 +19,12 @@ app.use(helmet());
 //Import Routes
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
+const tagRoute = require("./routes/tag");
 
 //Routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/tag", tagRoute);
 
 //Route Not Found
 app.use("/", (req, res, next) => {
