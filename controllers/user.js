@@ -181,7 +181,7 @@ module.exports = {
     }
   },
 
-  updateQuestion: (req, res, next) => {
+  updateQuestion: async (req, res, next) => {
     try {
       let { body, tags } = req.body;
       const question = req.question;
@@ -216,7 +216,7 @@ module.exports = {
 
       bodyImages.forEach((image) => {
         if (updatedBodyImages.indexOf(image) === -1) {
-          deleteImages(excludedFilenames);
+          deleteImages(image);
         }
       });
 
