@@ -216,7 +216,7 @@ module.exports = {
 
       bodyImages.forEach((image) => {
         if (updatedBodyImages.indexOf(image) === -1) {
-          deleteImages(image);
+          deleteImages([image]);
         }
       });
 
