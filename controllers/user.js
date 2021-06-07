@@ -183,15 +183,53 @@ module.exports = {
 
   updateQuestion: (req, res, next) => {
     try {
-      let { title, body, tags } = req.body;
+      let { body, tags } = req.body;
       const question = req.question;
-      title = title.trim();
+      const questionBody = question.body;
 
       const updatedBody = body.filter((item) => {
         if (item.insert) {
           return item.insert.image != process.env.IMAGE_PLACEHOLDER;
         }
         return false;
+      });
+
+      const bodyImages = questionBody.map((item) => {
+        if (item.insert) {
+          if (item.insert.image) {
+            const filePath = item.insert.image.split("/");
+            return filePath[filePath.length - 1];
+          }
+        }
+        return "";
+      });
+
+      const updatedBodyImages = body.filter((item) => {
+        if (item.insert) {
+          if (item.insert.image) {
+            const filePath = item.insert.image.split("/");
+            return filePath[filePath.length - 1];
+          }
+        }
+        return "";
+      });
+
+      bodyImages.forEach((image) => {
+        if (updatedBodyImages.indexOf(image) === -1) {
+          deleteImages(excludedFilenames);
+        }
+      });
+
+      question = _.merge(question, { body: updatedBody, tags: tags });
+
+      question.markModified("body");
+
+      const saveQuestion = await question.save();
+      if (!saveQuestion) {
+        throw error("Question not saved", 500);
+      }
+      return res.json({
+        message: "Question updated successfully",
       });
     } catch (err) {
       return next(err);
@@ -200,6 +238,7 @@ module.exports = {
 
   questionImagesUpload: async (req, res, next) => {
     try {
+      const { mode } = req.query;
       const question = req.question;
       const { body } = question;
       const multerFiles = req.files;
@@ -247,7 +286,7 @@ module.exports = {
         if (item.insert) {
           if (
             item.insert.image &&
-            item.insert.image.split("/")[0] !== process.env.DOMAIN
+            item.insert.image.indexOf(process.env.DOMAIN) == -1
           ) {
             item.insert.image =
               process.env.DOMAIN +
@@ -263,15 +302,19 @@ module.exports = {
       question.body = updatedBody;
 
       deleteImages(excludedFilenames);
-      
+
       question.markModified("body");
+
       const saveQuestion = await question.save();
       if (!saveQuestion) {
         throw error("Question not saved");
       }
 
       return res.json({
-        message: "Question created successfully",
+        message:
+          mode === "create"
+            ? "Question created successfully"
+            : "Question updated successfully",
       });
     } catch (err) {
       return next(err);
