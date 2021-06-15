@@ -6,7 +6,10 @@ const fs = require("fs"),
   Question = require("../models/question"),
   Answer = require("../models/answer"),
   User = require("../models/user"),
-  deleteImages = require("../utils/deleteImages.js");
+  deleteImages = require("../utils/deleteImages.js"),
+  getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
+  getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
+  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody");
 
 //Configure Environment variables
 environmentVariables();
@@ -151,12 +154,7 @@ module.exports = {
       const user = req.profile;
       title = title.trim();
 
-      const updatedBody = body.filter((item) => {
-        if (item.insert) {
-          return item.insert.image != process.env.IMAGE_PLACEHOLDER;
-        }
-        return false;
-      });
+      const updatedBody = deletePlaceholderFromBody(body);
 
       const question = await Question.create({
         title: title,
@@ -184,41 +182,11 @@ module.exports = {
   updateQuestion: async (req, res, next) => {
     try {
       let { body, tags } = req.body;
-      const question = req.question;
+      let question = req.question;
       const questionBody = question.body;
 
-      const updatedBody = body.filter((item) => {
-        if (item.insert) {
-          return item.insert.image != process.env.IMAGE_PLACEHOLDER;
-        }
-        return false;
-      });
-
-      const bodyImages = questionBody.map((item) => {
-        if (item.insert) {
-          if (item.insert.image) {
-            const filePath = item.insert.image.split("/");
-            return filePath[filePath.length - 1];
-          }
-        }
-        return "";
-      });
-
-      const updatedBodyImages = body.filter((item) => {
-        if (item.insert) {
-          if (item.insert.image) {
-            const filePath = item.insert.image.split("/");
-            return filePath[filePath.length - 1];
-          }
-        }
-        return "";
-      });
-
-      bodyImages.forEach((image) => {
-        if (updatedBodyImages.indexOf(image) === -1) {
-          deleteImages(new Array(image));
-        }
-      });
+      const { updatedBody, updatedBodyImages, bodyImages } =
+        getUpdatedBodyAndImages(body, questionBody);
 
       question = _.merge(question, { body: updatedBody, tags: tags });
 
@@ -228,6 +196,13 @@ module.exports = {
       if (!saveQuestion) {
         throw error("Question not saved", 500);
       }
+
+      bodyImages.forEach((image) => {
+        if (updatedBodyImages.indexOf(image) === -1) {
+          deleteImages(new Array(image));
+        }
+      });
+
       return res.json({
         message: "Question updated successfully",
       });
@@ -243,65 +218,12 @@ module.exports = {
       const { body } = question;
       const multerFiles = req.files;
 
-      const fileImages = multerFiles.map((file) => {
-        return file.originalname;
-      });
-
-      const bodyImages = body.map((item) => {
-        if (item.insert) {
-          if (item.insert.image) {
-            const filePath = item.insert.image.split("/");
-            return filePath[filePath.length - 1];
-          }
-        }
-        return "";
-      });
-
-      const includedImages = fileImages.filter((image) => {
-        return bodyImages.indexOf(image) != -1;
-      });
-
-      const excludedImages = fileImages.filter((image) => {
-        return bodyImages.indexOf(image) == -1;
-      });
-
-      const excludedFilenames = excludedImages.map((item) => {
-        for (let i = 0; i < multerFiles.length; i++) {
-          if (multerFiles[i].originalname === item) {
-            return multerFiles[i].filename;
-          }
-        }
-      });
-
-      const includedFilenames = includedImages.map((item) => {
-        for (let i = 0; i < multerFiles.length; i++) {
-          if (multerFiles[i].originalname === item) {
-            return multerFiles[i].filename;
-          }
-        }
-      });
-
-      let i = 0;
-      const updatedBody = body.map((item) => {
-        if (item.insert) {
-          if (
-            item.insert.image &&
-            item.insert.image.indexOf(process.env.DOMAIN) == -1
-          ) {
-            item.insert.image =
-              process.env.DOMAIN +
-              "/api/user/getImage" +
-              "/" +
-              includedFilenames[i];
-            i++;
-          }
-          return item;
-        }
-      });
+      const { updatedBody, excludedFilenames } = getUpdatedBodyAndExcludeFiles(
+        multerFiles,
+        body
+      );
 
       question.body = updatedBody;
-
-      deleteImages(excludedFilenames);
 
       question.markModified("body");
 
@@ -309,6 +231,8 @@ module.exports = {
       if (!saveQuestion) {
         throw error("Question not saved");
       }
+
+      deleteImages(excludedFilenames);
 
       return res.json({
         message:
@@ -352,14 +276,18 @@ module.exports = {
       return next(err);
     }
   },
+
   createAnswer: async (req, res, next) => {
     try {
       const { body } = req.body;
       const { userId, questionId } = req.params;
       const user = req.profile;
       const question = req.question;
+
+      const updatedBody = deletePlaceholderFromBody(body);
+
       const answer = await Answer.create({
-        body,
+        body: updatedBody,
         user: userId,
         question: questionId,
       });
@@ -380,7 +308,103 @@ module.exports = {
       }
 
       return res.json({
-        message: "Answer created successfully",
+        answerId: answer._id,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  updateAnswer: async (req, res, next) => {
+    try {
+      let { body } = req.body;
+      let answer = req.answer;
+      const answerBody = answer.body;
+
+      const { updatedBody, updatedBodyImages, bodyImages } =
+        getUpdatedBodyAndImages(body, answerBody);
+      question = _.merge(question, { body: updatedBody, tags: tags });
+
+      question.markModified("body");
+
+      const saveQuestion = await question.save();
+      if (!saveQuestion) {
+        throw error("Question not saved", 500);
+      }
+
+      bodyImages.forEach((image) => {
+        if (updatedBodyImages.indexOf(image) === -1) {
+          deleteImages(new Array(image));
+        }
+      });
+
+      return res.json({
+        message: "Question updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  answerImagesUpload: async (req, res, next) => {
+    try {
+      const { mode } = req.query;
+      const answer = req.answer;
+      const { body } = answer;
+      const multerFiles = req.files;
+
+      const { updatedBody, excludedFilenames } = getUpdatedBodyAndExcludeFiles(
+        multerFiles,
+        body
+      );
+
+      answer.body = updatedBody;
+
+      answer.markModified("body");
+
+      const saveAnswer = await answer.save();
+      if (!saveAnswer) {
+        throw error("Answer not saved");
+      }
+
+      deleteImages(excludedFilenames);
+
+      return res.json({
+        message:
+          mode === "create"
+            ? "Answer created successfully"
+            : "Answer updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  getAnswer: async (req, res, next) => {
+    try {
+      const answer = req.answer;
+      const populatedAnswer = await answer
+        .populate({
+          path: "user",
+          model: User,
+          select: "username profileImage.path",
+        })
+        .populate({
+          path: "question",
+          model: Question,
+          select: "-answers",
+          populate: {
+            path: "user",
+            model: User,
+            select: "username profileImage.path",
+          },
+        })
+        .execPopulate();
+
+      if (!populatedAnswer) {
+        throw error("Answer not saved", 500);
+      }
+      return res.json({
+        answer: populatedAnswer,
       });
     } catch (err) {
       return next(err);
