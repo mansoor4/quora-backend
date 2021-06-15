@@ -1,9 +1,12 @@
 const express = require("express"),
   app = express(),
-  cors = require("cors"),
   helmet = require("helmet"),
   error = require("./utils/error"),
   connectWithMongoDB = require("./config/mongodb");
+// path = require("path");
+
+// app.set("views", path.join(__dirname, "node_modules","redis-commander","web","views"));
+// app.set("view engine", "ejs");
 
 // Global Middlewares
 app.use((req, res, next) => {
@@ -13,13 +16,16 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
-// app.use(cors());
 app.use(helmet());
 
 //Import Routes
-const authRoute = require("./routes/auth");
-const userRoute = require("./routes/user");
-const tagRoute = require("./routes/tag");
+const { router } = require("./config/bull_board"),
+  authRoute = require("./routes/auth"),
+  userRoute = require("./routes/user"),
+  tagRoute = require("./routes/tag");
+
+//Bull Dashborad Route
+app.use("/admin/queues", router);
 
 //Routes
 app.use("/api/auth", authRoute);

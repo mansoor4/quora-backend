@@ -323,13 +323,14 @@ module.exports = {
 
       const { updatedBody, updatedBodyImages, bodyImages } =
         getUpdatedBodyAndImages(body, answerBody);
-      question = _.merge(question, { body: updatedBody, tags: tags });
 
-      question.markModified("body");
+      answer = _.merge(answer, { body: updatedBody });
 
-      const saveQuestion = await question.save();
-      if (!saveQuestion) {
-        throw error("Question not saved", 500);
+      answer.markModified("body");
+
+      const saveAnswer = await answer.save();
+      if (!saveAnswer) {
+        throw error("Answer not saved", 500);
       }
 
       bodyImages.forEach((image) => {
@@ -339,7 +340,7 @@ module.exports = {
       });
 
       return res.json({
-        message: "Question updated successfully",
+        message: "Answer updated successfully",
       });
     } catch (err) {
       return next(err);
