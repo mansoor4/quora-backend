@@ -10,10 +10,12 @@ const {
   createQuestion,
   updateQuestion,
   questionImagesUpload,
+  deleteQuestion,
   getQuestion,
   createAnswer,
   updateAnswer,
   answerImagesUpload,
+  deleteAnswer,
   getAnswer,
 } = require("../controllers/user");
 
@@ -74,6 +76,15 @@ router.post(
   multerUpload,
   answerImagesUpload
 );
+
+//DELETE
+router.delete(
+  "/deleteQuestion/:userId/:questionId",
+  isAuthenticated,
+  deleteQuestion
+);
+
+router.delete("/deleteAnswer/:userId/:answerId", isAuthenticated, deleteAnswer);
 
 //GET
 router.get("/getImage/:imageName", getImage);

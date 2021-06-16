@@ -1,4 +1,3 @@
-const { reject } = require("lodash");
 const mongoose = require("mongoose"),
   fs = require("fs"),
   path = require("path"),

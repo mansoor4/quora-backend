@@ -3,10 +3,6 @@ const express = require("express"),
   helmet = require("helmet"),
   error = require("./utils/error"),
   connectWithMongoDB = require("./config/mongodb");
-// path = require("path");
-
-// app.set("views", path.join(__dirname, "node_modules","redis-commander","web","views"));
-// app.set("view engine", "ejs");
 
 // Global Middlewares
 app.use((req, res, next) => {

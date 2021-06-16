@@ -16,3 +16,5 @@ const getUpdatedBodyAndImages = (body, reqBody) => {
 };
 
 module.exports = getUpdatedBodyAndImages;
+
+//http://192.168.43.220:8000/api/user/getImage/9b536170-8e02-4393-9c85-aa502f3ffa99-image_picker5582662130484549866.jpg

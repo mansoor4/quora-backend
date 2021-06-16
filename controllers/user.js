@@ -9,7 +9,8 @@ const fs = require("fs"),
   deleteImages = require("../utils/deleteImages.js"),
   getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
-  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody");
+  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
+  imageDeleteQueue = require("../queues/imageDelete");
 
 //Configure Environment variables
 environmentVariables();
@@ -95,9 +96,7 @@ module.exports = {
           };
         }
         if (user.profileImage.fileName) {
-          fs.unlinkSync(
-            path.join(__dirname, "..", "uploads", user.profileImage.fileName)
-          );
+          deleteImages(new Array(user.profileImage.fileName));
         }
       }
 
@@ -188,20 +187,25 @@ module.exports = {
       const { updatedBody, updatedBodyImages, bodyImages } =
         getUpdatedBodyAndImages(body, questionBody);
 
-      question = _.merge(question, { body: updatedBody, tags: tags });
+      question.body = updatedBody;
+      question.tags = tags;
 
       question.markModified("body");
+      question.markModified("tags");
 
       const saveQuestion = await question.save();
       if (!saveQuestion) {
         throw error("Question not saved", 500);
       }
 
+      const exclusiveImages = [];
       bodyImages.forEach((image) => {
         if (updatedBodyImages.indexOf(image) === -1) {
-          deleteImages(new Array(image));
+          exclusiveImages.push(image);
         }
       });
+
+      deleteImages(exclusiveImages);
 
       return res.json({
         message: "Question updated successfully",
@@ -239,6 +243,16 @@ module.exports = {
           mode === "create"
             ? "Question created successfully"
             : "Question updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  deleteQuestion: (req, res, next) => {
+    try {
+      res.json({
+        message: "Done",
       });
     } catch (err) {
       return next(err);
@@ -324,7 +338,7 @@ module.exports = {
       const { updatedBody, updatedBodyImages, bodyImages } =
         getUpdatedBodyAndImages(body, answerBody);
 
-      answer = _.merge(answer, { body: updatedBody });
+      answer.body = updatedBody;
 
       answer.markModified("body");
 
@@ -333,11 +347,15 @@ module.exports = {
         throw error("Answer not saved", 500);
       }
 
+      const exclusiveImages = [];
+
       bodyImages.forEach((image) => {
         if (updatedBodyImages.indexOf(image) === -1) {
-          deleteImages(new Array(image));
+          exclusiveImages.push(image);
         }
       });
+
+      deleteImages(exclusiveImages);
 
       return res.json({
         message: "Answer updated successfully",
@@ -407,6 +425,13 @@ module.exports = {
       return res.json({
         answer: populatedAnswer,
       });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  deleteAnswer: (req, res, next) => {
+    try {
     } catch (err) {
       return next(err);
     }
