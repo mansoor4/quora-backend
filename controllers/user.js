@@ -8,7 +8,8 @@ const fs = require("fs"),
   User = require("../models/user"),
   getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
-  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody");
+  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
+  getFileNamesFromBody = require("../utils/getFileNamesFromBody");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete");
@@ -190,6 +191,17 @@ module.exports = {
       const { updatedBody, updatedBodyImages, bodyImages } =
         getUpdatedBodyAndImages(body, questionBody);
 
+      const excludeImages = [];
+      bodyImages.forEach((image) => {
+        if (updatedBodyImages.indexOf(image) === -1) {
+          excludeImages.push(image);
+        }
+      });
+
+      imageDeleteQueue.add({
+        filenames: excludeImages,
+      });
+
       question.body = updatedBody;
       question.tags = tags;
 
@@ -200,17 +212,6 @@ module.exports = {
       if (!saveQuestion) {
         throw error("Question not saved", 500);
       }
-
-      const exclusiveImages = [];
-      bodyImages.forEach((image) => {
-        if (updatedBodyImages.indexOf(image) === -1) {
-          exclusiveImages.push(image);
-        }
-      });
-
-      imageDeleteQueue.add({
-        filenames: exclusiveImages,
-      });
 
       return res.json({
         message: "Question updated successfully",
@@ -232,6 +233,10 @@ module.exports = {
         body
       );
 
+      imageDeleteQueue.add({
+        filenames: excludedFilenames,
+      });
+
       question.body = updatedBody;
 
       question.markModified("body");
@@ -240,10 +245,6 @@ module.exports = {
       if (!saveQuestion) {
         throw error("Question not saved");
       }
-
-      imageDeleteQueue.add({
-        filenames: excludedFilenames,
-      });
 
       return res.json({
         message:
@@ -350,6 +351,18 @@ module.exports = {
       const { updatedBody, updatedBodyImages, bodyImages } =
         getUpdatedBodyAndImages(body, answerBody);
 
+      const excludeImages = [];
+
+      bodyImages.forEach((image) => {
+        if (updatedBodyImages.indexOf(image) === -1) {
+          excludeImages.push(image);
+        }
+      });
+
+      imageDeleteQueue.add({
+        filenames: excludeImages,
+      });
+
       answer.body = updatedBody;
 
       answer.markModified("body");
@@ -358,18 +371,6 @@ module.exports = {
       if (!saveAnswer) {
         throw error("Answer not saved", 500);
       }
-
-      const exclusiveImages = [];
-
-      bodyImages.forEach((image) => {
-        if (updatedBodyImages.indexOf(image) === -1) {
-          exclusiveImages.push(image);
-        }
-      });
-
-      imageDeleteQueue.add({
-        filenames: exclusiveImages,
-      });
 
       return res.json({
         message: "Answer updated successfully",
@@ -391,6 +392,10 @@ module.exports = {
         body
       );
 
+      imageDeleteQueue.add({
+        filenames: excludedFilenames,
+      });
+
       answer.body = updatedBody;
 
       answer.markModified("body");
@@ -399,10 +404,6 @@ module.exports = {
       if (!saveAnswer) {
         throw error("Answer not saved");
       }
-
-      imageDeleteQueue.add({
-        filenames: excludedFilenames,
-      });
 
       return res.json({
         message:
@@ -448,11 +449,37 @@ module.exports = {
 
   deleteAnswer: async (req, res, next) => {
     try {
+      const user = req.user;
+      const question = req.question;
       const answer = req.answer;
+
+      const { answerId } = req.params;
+
+      const excludeImages = getFileNamesFromBody(body).filter(
+        (name) => name !== ""
+      );
+
+      imageDeleteQueue.add({
+        filenames: excludeImages,
+      });
+
       const deleteAnswer = await answer.remove();
       if (!deleteAnswer) {
         throw error("Answer Not Deleted");
       }
+
+      user.answers.pull(answerId);
+      const saveUser = await user.save();
+      if (!saveUser) {
+        throw error("User Not Saved");
+      }
+
+      question.answers.pull(answerId);
+      const saveQuestion = await question.save();
+      if (!saveQuestion) {
+        throw error("Question not Saved");
+      }
+
       res.json({
         message: "Answer Deleted Successfully",
       });

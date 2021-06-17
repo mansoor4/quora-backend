@@ -84,7 +84,11 @@ router.delete(
   deleteQuestion
 );
 
-router.delete("/deleteAnswer/:userId/:answerId", isAuthenticated, deleteAnswer);
+router.delete(
+  "/deleteAnswer/:userId/:questionId/:answerId",
+  isAuthenticated,
+  deleteAnswer
+);
 
 //GET
 router.get("/getImage/:imageName", getImage);
