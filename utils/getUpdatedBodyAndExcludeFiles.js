@@ -52,7 +52,6 @@ const getUpdatedBodyAndExcludeFiles = (multerFiles, body) => {
   return {
     updatedBody,
     excludedFilenames,
-    bodyImages,
   };
 };
 

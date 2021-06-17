@@ -6,11 +6,12 @@ const fs = require("fs"),
   Question = require("../models/question"),
   Answer = require("../models/answer"),
   User = require("../models/user"),
-  deleteImages = require("../utils/deleteImages.js"),
   getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
-  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
-  imageDeleteQueue = require("../queues/imageDelete");
+  deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody");
+
+//Queues
+const imageDeleteQueue = require("../queues/imageDelete");
 
 //Configure Environment variables
 environmentVariables();
@@ -96,7 +97,9 @@ module.exports = {
           };
         }
         if (user.profileImage.fileName) {
-          deleteImages(new Array(user.profileImage.fileName));
+          imageDeleteQueue.add({
+            filenames: new Array(user.profileImage.fileName),
+          });
         }
       }
 
@@ -205,7 +208,9 @@ module.exports = {
         }
       });
 
-      deleteImages(exclusiveImages);
+      imageDeleteQueue.add({
+        filenames: exclusiveImages,
+      });
 
       return res.json({
         message: "Question updated successfully",
@@ -236,7 +241,9 @@ module.exports = {
         throw error("Question not saved");
       }
 
-      deleteImages(excludedFilenames);
+      imageDeleteQueue.add({
+        filenames: excludedFilenames,
+      });
 
       return res.json({
         message:
@@ -249,10 +256,15 @@ module.exports = {
     }
   },
 
-  deleteQuestion: (req, res, next) => {
+  deleteQuestion: async (req, res, next) => {
     try {
+      const question = req.question;
+      const deleteQuestion = await question.remove();
+      if (!deleteQuestion) {
+        throw error("Answer Not Deleted");
+      }
       res.json({
-        message: "Done",
+        message: "Question Deleted Successfully",
       });
     } catch (err) {
       return next(err);
@@ -355,7 +367,9 @@ module.exports = {
         }
       });
 
-      deleteImages(exclusiveImages);
+      imageDeleteQueue.add({
+        filenames: exclusiveImages,
+      });
 
       return res.json({
         message: "Answer updated successfully",
@@ -386,7 +400,9 @@ module.exports = {
         throw error("Answer not saved");
       }
 
-      deleteImages(excludedFilenames);
+      imageDeleteQueue.add({
+        filenames: excludedFilenames,
+      });
 
       return res.json({
         message:
@@ -430,8 +446,16 @@ module.exports = {
     }
   },
 
-  deleteAnswer: (req, res, next) => {
+  deleteAnswer: async (req, res, next) => {
     try {
+      const answer = req.answer;
+      const deleteAnswer = await answer.remove();
+      if (!deleteAnswer) {
+        throw error("Answer Not Deleted");
+      }
+      res.json({
+        message: "Answer Deleted Successfully",
+      });
     } catch (err) {
       return next(err);
     }

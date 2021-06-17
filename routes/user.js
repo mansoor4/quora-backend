@@ -91,8 +91,8 @@ router.get("/getImage/:imageName", getImage);
 
 router.get("/getUser/:userId", isAuthenticated, getUser);
 
-router.get("/getQuestion/:questionId", isAuthenticated, getQuestion);
+router.get("/getQuestion/:userId/:questionId", isAuthenticated, getQuestion);
 
-router.get("/getAnswer/:answerId", isAuthenticated, getAnswer);
+router.get("/getAnswer/:userId/:answerId", isAuthenticated, getAnswer);
 
 module.exports = router;
