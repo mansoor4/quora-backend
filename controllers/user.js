@@ -452,6 +452,7 @@ module.exports = {
       const user = req.user;
       const question = req.question;
       const answer = req.answer;
+      const body = answer.body;
 
       const { answerId } = req.params;
 
