@@ -24,7 +24,8 @@ const multerUpload = require("../middleware/multerUpload"),
   getUserById = require("../middleware/getUserById"),
   getQuestionById = require("../middleware/getQuestionById"),
   getAnswerById = require("../middleware/getAnswerById"),
-  isAuthenticated = require("../middleware/isAuthenticated");
+  isAuthenticated = require("../middleware/isAuthenticated"),
+  questionUpdateAndDeleteValidation = require("../middleware/questionUpdateAndDeleteValidation");
 
 //Params Middlewares
 router.param("userId", getUserById);
@@ -40,6 +41,7 @@ router.post(
   multerUpload,
   createProfile
 );
+
 router.post(
   "/updateProfile/:userId",
   isAuthenticated,
@@ -52,6 +54,7 @@ router.post("/createQuestion/:userId", isAuthenticated, createQuestion);
 router.post(
   "/updateQuestion/:userId/:questionId",
   isAuthenticated,
+  questionUpdateAndDeleteValidation,
   updateQuestion
 );
 
@@ -81,6 +84,7 @@ router.post(
 router.delete(
   "/deleteQuestion/:userId/:questionId",
   isAuthenticated,
+  questionUpdateAndDeleteValidation,
   deleteQuestion
 );
 

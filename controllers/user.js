@@ -259,11 +259,51 @@ module.exports = {
 
   deleteQuestion: async (req, res, next) => {
     try {
+      const user = req.profile;
       const question = req.question;
+
+      const { questionId } = req.params;
+
+      const deleteAnswers = question.answers;
+
+      const excludedImages = getFileNamesFromBody(question.body).filter(
+        (name) => name !== ""
+      );
+
+      const answersOfQuestion = await Answer.find({
+        _id: { $in: deleteAnswers },
+      }).select("body");
+      if (!answersOfQuestion.length) {
+        throw error();
+      }
+
+      answersOfQuestion.forEach((answer) => {
+        excludedImages = excludedImages.concat(
+          getFileNamesFromBody(answer.body).filter((name) => name !== "")
+        );
+      });
+
+      imageDeleteQueue.add({
+        filenames: excludedImages,
+      });
+
       const deleteQuestion = await question.remove();
       if (!deleteQuestion) {
         throw error("Answer Not Deleted");
       }
+
+      user.questions.pull(questionId);
+      const saveUser = await user.save();
+      if (!saveUser) {
+        throw error("User not saved");
+      }
+
+      const answerAfterDeletion = await Answer.deleteMany({
+        _id: { $in: deleteAnswers },
+      });
+
+      console.log(answerAfterDeletion);
+
       res.json({
         message: "Question Deleted Successfully",
       });
@@ -449,7 +489,7 @@ module.exports = {
 
   deleteAnswer: async (req, res, next) => {
     try {
-      const user = req.user;
+      const user = req.profile;
       const question = req.question;
       const answer = req.answer;
       const body = answer.body;
@@ -470,12 +510,14 @@ module.exports = {
       }
 
       user.answers.pull(answerId);
+      user.markModified("answers");
       const saveUser = await user.save();
       if (!saveUser) {
         throw error("User Not Saved");
       }
 
       question.answers.pull(answerId);
+      question.markModified("answers");
       const saveQuestion = await question.save();
       if (!saveQuestion) {
         throw error("Question not Saved");
