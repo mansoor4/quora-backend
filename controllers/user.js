@@ -142,6 +142,19 @@ module.exports = {
         })
         .execPopulate();
 
+      // const populatedAnswersOfUser = populatedUser.answers.map(
+      //   (answer) => answer._id
+      // );
+      // const nonPopulatedAnswerOfUser = user.answers;
+
+      // if (nonPopulatedAnswerOfUser !== populatedAnswersOfUser) {
+      //   user.answers = populatedAnswersOfUser;
+      //   const saveUser = await user.save();
+      //   if (!saveUser) {
+      //     throw error();
+      //   }
+      // }
+
       return res.json({
         user: populatedUser,
       });
@@ -276,6 +289,8 @@ module.exports = {
       if (!answersOfQuestion.length) {
         throw error();
       }
+      console.log("Answer Of Question");
+      console.log(answersOfQuestion);
 
       answersOfQuestion.forEach((answer) => {
         excludedImages = excludedImages.concat(
@@ -302,6 +317,7 @@ module.exports = {
         _id: { $in: deleteAnswers },
       });
 
+      console.log("After Deletion");
       console.log(answerAfterDeletion);
 
       res.json({
