@@ -119,6 +119,8 @@ module.exports = {
   getUser: async (req, res, next) => {
     try {
       const user = req.profile;
+      const nonPopulatedAnswerOfUser = [...user.answers];
+
       const populatedUser = await user
         .populate({
           path: "questions",
@@ -142,18 +144,17 @@ module.exports = {
         })
         .execPopulate();
 
-      // const populatedAnswersOfUser = populatedUser.answers.map(
-      //   (answer) => answer._id
-      // );
-      // const nonPopulatedAnswerOfUser = user.answers;
+      const populatedAnswersOfUser = populatedUser.answers.map(
+        (answer) => answer._id
+      );
 
-      // if (nonPopulatedAnswerOfUser !== populatedAnswersOfUser) {
-      //   user.answers = populatedAnswersOfUser;
-      //   const saveUser = await user.save();
-      //   if (!saveUser) {
-      //     throw error();
-      //   }
-      // }
+      if (nonPopulatedAnswerOfUser !== populatedAnswersOfUser) {
+        user.answers = populatedAnswersOfUser;
+        const saveUser = await user.save();
+        if (!saveUser) {
+          throw error();
+        }
+      }
 
       return res.json({
         user: populatedUser,
@@ -279,7 +280,7 @@ module.exports = {
 
       const deleteAnswers = question.answers;
 
-      const excludedImages = getFileNamesFromBody(question.body).filter(
+      let excludedImages = getFileNamesFromBody(question.body).filter(
         (name) => name !== ""
       );
 
@@ -289,8 +290,6 @@ module.exports = {
       if (!answersOfQuestion.length) {
         throw error();
       }
-      console.log("Answer Of Question");
-      console.log(answersOfQuestion);
 
       answersOfQuestion.forEach((answer) => {
         excludedImages = excludedImages.concat(
@@ -317,8 +316,9 @@ module.exports = {
         _id: { $in: deleteAnswers },
       });
 
-      console.log("After Deletion");
-      console.log(answerAfterDeletion);
+      if (!answerAfterDeletion.ok) {
+        throw error();
+      }
 
       res.json({
         message: "Question Deleted Successfully",

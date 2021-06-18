@@ -23,7 +23,8 @@ const questionUpdateAndDeleteValidation = async (req, res, next) => {
 
     if (filterAnswer.length) {
       throw error(
-        `The Question cannot ${message} because it has answers which are upvoted or verified `
+        `The Question cannot ${message} because it has answers which are upvoted or verified `,
+        422
       );
     }
 
