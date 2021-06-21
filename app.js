@@ -1,8 +1,16 @@
 const express = require("express"),
-  app = express(),
   helmet = require("helmet"),
   error = require("./utils/error"),
   connectWithMongoDB = require("./config/mongodb");
+
+//Importing Sockets
+const tagSocket = require("./socket/tagSocket");
+
+//Server
+const { server, app } = require("./config/server.js");
+
+//Sockets
+tagSocket();
 
 // Global Middlewares
 app.use((req, res, next) => {
@@ -45,4 +53,4 @@ app.use("/", (error, req, res, next) => {
 });
 
 // MongoDB conection And Server Running
-connectWithMongoDB(app);
+connectWithMongoDB(server);

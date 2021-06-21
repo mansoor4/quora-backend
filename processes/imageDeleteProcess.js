@@ -1,8 +1,8 @@
 const path = require("path"),
   fs = require("fs");
 
-const imageDeleteProcess = async (job) => {
-  const { filenames } = job.data;
+const imageDeleteProcess = async ({ data }) => {
+  const { filenames } = data;
   filenames.forEach((filename) => {
     fs.unlinkSync(path.join(__dirname, "..", "uploads", filename));
   });

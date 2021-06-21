@@ -12,7 +12,8 @@ const fs = require("fs"),
   getFileNamesFromBody = require("../utils/getFileNamesFromBody");
 
 //Queues
-const imageDeleteQueue = require("../queues/imageDelete");
+const imageDeleteQueue = require("../queues/imageDelete"),
+  answerDeleteFromUserQueue = require("../queues/answerDeleteFromUser");
 
 //Configure Environment variables
 environmentVariables();
@@ -144,17 +145,10 @@ module.exports = {
         })
         .execPopulate();
 
-      const populatedAnswersOfUser = populatedUser.answers.map(
-        (answer) => answer._id
-      );
-
-      if (nonPopulatedAnswerOfUser !== populatedAnswersOfUser) {
-        user.answers = populatedAnswersOfUser;
-        const saveUser = await user.save();
-        if (!saveUser) {
-          throw error();
-        }
-      }
+      answerDeleteFromUserQueue.add({
+        nonPopulatedAnswerOfUser,
+        user,
+      });
 
       return res.json({
         user: populatedUser,

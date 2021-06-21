@@ -1,4 +1,5 @@
 const User = require("../models/user");
+
 //Controllers
 module.exports = {
   getAllTags: async (req, res, next) => {
