@@ -108,19 +108,24 @@ userSchema.statics.getTags = () => {
   });
 };
 
-userSchema.statics.addTag = (tagName) => {
+userSchema.statics.addTags = (newTags) => {
   return new Promise(async (resolve, reject) => {
     try {
       const { getTags } = userSchema.statics;
       const tags = await getTags();
-      const findTag = tags.indexOf(tagName);
-      if (findTag != -1) {
-        throw error("Tag is already present", 422);
-      }
-      tags.push(tagName);
+      const newUpdatedTags = newTags.filter((tag) => {
+        if (tags.indexOf(tag) == -1) {
+          return true;
+        }
+        return false;
+      });
+
+      tags.concat(newUpdatedTags);
+
       const tagJson = JSON.stringify({ tags: tags });
 
       const result = await writeTagFile(tagJson);
+
       if (result) {
         return resolve(true);
       }

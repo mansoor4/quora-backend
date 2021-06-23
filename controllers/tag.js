@@ -1,4 +1,6 @@
-const User = require("../models/user");
+const User = require("../models/user"),
+  Tag = require("../models/tag"),
+  error = require("../utils/error");
 
 //Controllers
 module.exports = {
@@ -13,12 +15,29 @@ module.exports = {
     }
   },
 
-  addTagByName: async (req, res, next) => {
+  getAllAdminTags: async (req, res, next) => {
     try {
-      let { tagName } = req.body;
-      tagName = tagName.trim();
+      const tags = await Tag.find();
+      if (!tags) {
+        throw error("Error in getting tags", 500);
+      }
 
-      const result = await User.addTag(tagName);
+      return res.json({
+        tags,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  addTags: async (req, res, next) => {
+    try {
+      let { tags, tagId } = req.body;
+      const deletedTag = await Tag.findByIdAndRemove(tagId);
+      if (!deletedTag) {
+        throw error("Tags not added", 500);
+      }
+      const result = await User.addTags(tags);
       if (result) {
         return res.json({
           message: "Tags add successfully",

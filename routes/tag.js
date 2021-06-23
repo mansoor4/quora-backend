@@ -2,11 +2,7 @@ const express = require("express"),
   router = express.Router();
 
 //Importing Controllers
-const {
-  getAllTags,
-  addTagByName,
-  deleteTagByName,
-} = require("../controllers/tag");
+const { getAllTags, addTags, deleteTagByName } = require("../controllers/tag");
 
 //Importing Middlewares
 const isAuthenticated = require("../middleware/isAuthenticated");
@@ -17,7 +13,7 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 router.get("/getAlltags", isAuthenticated, getAllTags);
 
 //POST
-router.post("/addTagByName", isAuthenticated, addTagByName);
+router.post("/addTagByName", isAuthenticated, addTags);
 
 //DELETE
 

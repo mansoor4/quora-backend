@@ -6,9 +6,14 @@ const tagSchema = new mongoose.Schema({
     default: [],
   },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    profileImage: {
+      type: String,
+      default: null,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
   },
 });
 

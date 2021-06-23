@@ -1,16 +1,14 @@
 const connectSocket = require("../config/socket"),
-  Tag = require("../models/tag"),
-  error = require("../utils/error");
+  Tag = require("../models/tag");
 
 const tagSocket = () => {
   connectSocket((socket, io) => {
-    //1. emit the addTag event from app side
-    //2. listen the addTag event on server and store tag data in database
-    //3. emit getTag event from server which was received by admin side
-    //4. listen getTag event on admin side
     socket.on("addTag", async (payload) => {
       try {
-        const tag = await Tag.create(payload);
+        const { tags, profileImage, username } = payload;
+        const newTag = { tags: tags, user: { profileImage, username } };
+        const tag = await Tag.create(newTag);
+        io.emit("getTag", { tag: tag });
       } catch (err) {
         console.log(err);
       }

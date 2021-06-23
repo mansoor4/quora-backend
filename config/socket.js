@@ -8,10 +8,10 @@ const io = require("socket.io")(server, {
   },
 });
 
-const connectSocket = (func) => {
+const connectSocket = (cb) => {
   io.on("connection", (socket) => {
     console.log("New user connected");
-    func(socket,io);
+    cb(socket, io);
   });
 };
 
