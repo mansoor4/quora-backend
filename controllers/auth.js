@@ -43,10 +43,7 @@ module.exports = {
         throw error("User not created", 500);
       }
 
-      const token = jwt.sign(
-        { id: user._id, email: email },
-        process.env.SECRET
-      );
+      const token = jwt.sign({ email: email }, process.env.SECRET);
 
       return res.json({
         token: token,
@@ -60,23 +57,33 @@ module.exports = {
   },
   signin: async (req, res, next) => {
     try {
+      const { role } = req.query;
       const { email } = req.body;
       const user = await User.findOne({ email: email });
       if (!user) {
         throw error();
       }
+      let payload = {};
+      if (role !== "admin") {
+        payload = { email: email };
+      }
 
-      const token = jwt.sign(
-        { id: user._id, email: email },
-        process.env.SECRET
-      );
+      const token = jwt.sign(payload, process.env.SECRET);
+
+      let information = {};
+
+      if (role !== "admin") {
+        information = {
+          profilePath: null,
+          profileCompleted: user.profileCompleted,
+          message: "Signin Sucessfully",
+        };
+      }
 
       return res.json({
         token: token,
         userId: user._id,
-        profilePath: null,
-        profileCompleted: user.profileCompleted,
-        message: "Signin Sucessfully",
+        ...information,
       });
     } catch (err) {
       return next(err);
@@ -106,7 +113,7 @@ module.exports = {
           profileImage: {
             path: picture,
             originalName: null,
-            fileName:null,
+            fileName: null,
             size: null,
           },
         });

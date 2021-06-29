@@ -10,6 +10,7 @@ const signinValidation = async (req, res, next) => {
     req.body.password = req.body.password.trim();
 
     let { email, password } = req.body;
+    const { role } = req.query;
 
     //Email Validation
     if (isEmpty(email)) {
@@ -43,6 +44,12 @@ const signinValidation = async (req, res, next) => {
 
     if (hashPassword !== user.password) {
       throw error("Password is incorrect", 422);
+    }
+
+    if (role === "admin") {
+      if (!user.admin) {
+        throw error("You are not admin", 422);
+      }
     }
 
     return next();

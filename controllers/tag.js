@@ -35,7 +35,7 @@ module.exports = {
       let { tags, tagId } = req.body;
       const deletedTag = await Tag.findByIdAndRemove(tagId);
       if (!deletedTag) {
-        throw error("Tags not added", 500);
+        throw error("Tags not added try again");
       }
       const result = await User.addTags(tags);
       if (result) {

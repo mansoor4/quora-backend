@@ -1,5 +1,6 @@
 const express = require("express"),
   helmet = require("helmet"),
+  cors = require("cors"),
   error = require("./utils/error"),
   connectWithMongoDB = require("./config/mongodb");
 
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-type,Authorization");
   next();
 });
+app.use(cors());
 app.use(express.json());
 app.use(helmet());
 

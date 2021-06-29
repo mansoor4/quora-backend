@@ -89,6 +89,10 @@ const userSchema = new mongoose.Schema(
     },
     answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }],
+    admin: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
