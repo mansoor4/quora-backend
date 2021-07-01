@@ -45,6 +45,7 @@ app.use("/", (req, res, next) => {
 
 //Error handler Middleware
 app.use("/", (error, req, res, next) => {
+  console.log(error);
   const message = error.message || "Something went wrong";
   const status = error.status || 500;
   return res.status(status).json({

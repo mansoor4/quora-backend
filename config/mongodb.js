@@ -9,6 +9,7 @@ const connectWithMongoDB = async (server) => {
     await mongoose.connect("mongodb://localhost/quora", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useFindAndModify: false,
     });
     console.log("MongoDB Connected");
     await server.listen(process.env.PORT);

@@ -117,19 +117,28 @@ userSchema.statics.addTags = (newTags) => {
     try {
       const { getTags } = userSchema.statics;
       const tags = await getTags();
-      const newUpdatedTags = newTags.filter((tag) => {
+      const sanitizeTags = newTags.map((tag) =>
+        tag
+          .split(" ")
+          .map(
+            (splitTag) =>
+              splitTag.charAt(0).toUpperCase() + splitTag.slice(1).toLowerCase()
+          )
+          .join(" ")
+      );
+
+      const newUpdatedTags = sanitizeTags.filter((tag) => {
         if (tags.indexOf(tag) == -1) {
           return true;
         }
         return false;
       });
 
-      tags.concat(newUpdatedTags);
+      const concatedTags = tags.concat(newUpdatedTags);
 
-      const tagJson = JSON.stringify({ tags: tags });
+      const tagJson = JSON.stringify({ tags: concatedTags });
 
       const result = await writeTagFile(tagJson);
-
       if (result) {
         return resolve(true);
       }
