@@ -16,14 +16,8 @@ const answerSchema = new mongoose.Schema(
       ref: "Question",
       required: true,
     },
-    upVote: {
-      type: Number,
-      default: 0,
-    },
-    downVote: {
-      type: Number,
-      default: 0,
-    },
+    upVote: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    downVote: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     verified: {
       type: Boolean,
       default: false,

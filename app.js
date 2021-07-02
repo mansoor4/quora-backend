@@ -28,6 +28,8 @@ app.use(helmet());
 const { router } = require("./config/bull_board"),
   authRoute = require("./routes/auth"),
   userRoute = require("./routes/user"),
+  questionRoute = require("./routes/question"),
+  answerRoute = require("./routes/answer"),
   tagRoute = require("./routes/tag");
 
 //Bull Dashborad Route
@@ -36,6 +38,8 @@ app.use("/admin/queues", router);
 //Routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/question", questionRoute);
+app.use("/api/answer", answerRoute);
 app.use("/api/tag", tagRoute);
 
 //Route Not Found

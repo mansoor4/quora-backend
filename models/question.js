@@ -15,14 +15,8 @@ const questionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    upVote: {
-      type: Number,
-      default: 0,
-    },
-    downVote: {
-      type: Number,
-      default: 0,
-    },
+    upVote: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    downVote: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     Views: {
       type: Number,
       default: 0,
