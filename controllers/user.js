@@ -6,10 +6,10 @@ const _ = require("lodash"),
 //Import Utils
 const error = require("../utils/error"),
   environmentVariables = require("../config/environmentVariables");
-  
+
 //Import Models
-// const User = require("../models/user"),
-const Question = require("../models/question"),
+const User = require("../models/user"),
+  Question = require("../models/question"),
   Answer = require("../models/answer");
 
 //Queues

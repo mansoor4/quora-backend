@@ -9,7 +9,7 @@ const error = require("../utils/error"),
 
 //Import Models
 const User = require("../models/user"),
-  //   Question = require("../models/question"),
+    Question = require("../models/question"),
   Answer = require("../models/answer");
 
 //Queues

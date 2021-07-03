@@ -9,8 +9,8 @@ const error = require("../utils/error"),
 
 //Import Models
 const User = require("../models/user"),
-  Question = require("../models/question");
-//   Answer = require("../models/answer");
+  Question = require("../models/question"),
+  Answer = require("../models/answer");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete");
