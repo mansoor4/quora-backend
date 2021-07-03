@@ -45,7 +45,7 @@ router.put(
 );
 
 router.put(
-  "/updateQuestionVote/:answerId",
+  "/updateQuestionVote/:questionId",
   isAuthenticated,
   updateQuestionVote
 );

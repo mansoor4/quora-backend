@@ -26,6 +26,7 @@ app.use(helmet());
 
 //Import Routes
 const { router } = require("./config/bull_board"),
+  globalRoute = require("./routes/global"),
   authRoute = require("./routes/auth"),
   userRoute = require("./routes/user"),
   questionRoute = require("./routes/question"),
@@ -36,6 +37,7 @@ const { router } = require("./config/bull_board"),
 app.use("/admin/queues", router);
 
 //Routes
+app.use("/api", globalRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
 app.use("/api/question", questionRoute);

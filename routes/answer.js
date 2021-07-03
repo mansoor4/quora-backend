@@ -8,6 +8,7 @@ const {
   updateAnswer,
   deleteAnswer,
   answerImagesUpload,
+  updateAnswerVote,
 } = require("../controllers/answer");
 
 //Importing Middlewares
@@ -42,6 +43,8 @@ router.put(
   isAuthenticated,
   updateAnswer
 );
+
+router.put("/updateAnswerVote/:answerId", isAuthenticated, updateAnswerVote);
 
 //DELETE
 router.delete(

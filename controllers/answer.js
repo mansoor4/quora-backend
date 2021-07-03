@@ -30,21 +30,13 @@ module.exports = {
         user: userId,
         question: questionId,
       });
-      if (!answer) {
-        throw error("Answer not crated", 500);
-      }
+
       user.answers.push(answer);
       question.answers.push(answer);
 
-      const saveUser = await user.save();
-      if (!saveUser) {
-        throw error("user not saved");
-      }
+      await user.save();
 
-      const saveQuestion = await question.save();
-      if (!saveQuestion) {
-        throw error("Question not saved");
-      }
+      await question.save();
 
       return res.json({
         answerId: answer._id,
@@ -197,6 +189,56 @@ module.exports = {
 
       res.json({
         message: "Answer Deleted Successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  updateAnswerVote: async (req, res, next) => {
+    const { type } = req.query;
+    const { userId, upVote, downVote } = req.body;
+    const answer = req.answer;
+    let upPush = true;
+    let downPush = true;
+    try {
+      if (type === "up") {
+        if (downVote) {
+          //pull userid from downVote
+          //push userId in upVote
+          answer.downVote.pull(userId);
+        } else {
+          if (upVote) {
+            //pull userid from upVote
+            upPush = false;
+          }
+        }
+        if (upPush) {
+          answer.upVote.push(userId);
+        } else {
+          answer.upVote.pull(userId);
+        }
+      } else {
+        if (upVote) {
+          //pull userid from upVote
+          //push userId in downVote
+          answer.upVote.pull(userId);
+        } else {
+          if (downVote) {
+            //pull userid from downVote
+            downPush = false;
+          }
+        }
+        if (downPush) {
+          answer.downVote.push(userId);
+        } else {
+          answer.downVote.pull(userId);
+        }
+      }
+
+      await answer.save();
+
+      return res.json({
+        message: "Vote updated successfully",
       });
     } catch (err) {
       return next(err);

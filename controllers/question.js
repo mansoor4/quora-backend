@@ -9,7 +9,7 @@ const error = require("../utils/error"),
 
 //Import Models
 const User = require("../models/user"),
-    Question = require("../models/question"),
+  Question = require("../models/question"),
   Answer = require("../models/answer");
 
 //Queues
@@ -212,21 +212,52 @@ module.exports = {
     }
   },
 
-  updateQuestionVote: (req, res, next) => {
+  updateQuestionVote: async (req, res, next) => {
     const { type } = req.query;
     const { userId, upVote, downVote } = req.body;
+    const question = req.question;
+    let upPush = true;
+    let downPush = true;
     try {
-        if(type==="up"){
-          if(!upVote && !downVote){
-
-          }
-          else if(!upVote && downVote){
-              
+      if (type === "up") {
+        if (downVote) {
+          //pull userid from downVote
+          //push userId in upVote
+          question.downVote.pull(userId);
+        } else {
+          if (upVote) {
+            //pull userid from upVote
+            upPush = false;
           }
         }
-        else{
-
+        if (upPush) {
+          question.upVote.push(userId);
+        } else {
+          question.upVote.pull(userId);
         }
+      } else {
+        if (upVote) {
+          //pull userid from upVote
+          //push userId in downVote
+          question.upVote.pull(userId);
+        } else {
+          if (downVote) {
+            //pull userid from downVote
+            downPush = false;
+          }
+        }
+        if (downPush) {
+          question.downVote.push(userId);
+        } else {
+          question.downVote.pull(userId);
+        }
+      }
+
+      await question.save();
+
+      return res.json({
+        message: "Vote updated successfully",
+      });
     } catch (err) {
       return next(err);
     }

@@ -1,7 +1,5 @@
 //Import Packages
-const _ = require("lodash"),
-  fs = require("fs"),
-  path = require("path");
+const _ = require("lodash");
 
 //Import Utils
 const error = require("../utils/error"),
@@ -21,23 +19,6 @@ environmentVariables();
 
 //Controllers
 module.exports = {
-  getImage: (req, res, next) => {
-    try {
-      const { imageName } = req.params;
-      fs.readFile(
-        path.join(__dirname, "..", "uploads", imageName),
-        (err, data) => {
-          if (err) {
-            return next(err);
-          }
-          return res.send(data);
-        }
-      );
-    } catch (err) {
-      return next(err);
-    }
-  },
-
   createProfile: async (req, res, next) => {
     try {
       let { branch, year, contact, college } = req.body;

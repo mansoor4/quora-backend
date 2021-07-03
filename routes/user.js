@@ -21,7 +21,7 @@ router.param("userId", getUserById);
 
 //GET
 router.get("/getUser/:userId", isAuthenticated, getUser);
-router.get("/getImage/:imageName", getImage);
+
 
 //POST
 router.post(
