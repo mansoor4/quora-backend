@@ -34,7 +34,7 @@ module.exports = {
           ? {
               path:
                 process.env.DOMAIN +
-                "/api/user/getImage" +
+                "/api/getImage" +
                 "/" +
                 req.files[0].filename,
               originalName: req.files[0].originalname,
@@ -68,7 +68,7 @@ module.exports = {
             profileImage: {
               path:
                 process.env.DOMAIN +
-                "/api/user/getImage" +
+                "/api/getImage" +
                 "/" +
                 req.files[0].filename,
               originalName: req.files[0].originalname,
@@ -160,15 +160,18 @@ module.exports = {
   getBookmarks: async (req, res, next) => {
     const user = req.profile;
     try {
-      await user.bookmark
+      await user
         .populate({
-          path: "question",
-          model: Question,
-          select: "title user",
+          path: "bookmark",
           populate: {
-            path: "user",
-            model: User,
-            select: "username profileImage.path",
+            path: "question",
+            model: Question,
+            select: "title user",
+            populate: {
+              path: "user",
+              model: User,
+              select: "username profileImage.path",
+            },
           },
         })
         .execPopulate();

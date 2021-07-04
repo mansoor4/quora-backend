@@ -39,10 +39,7 @@ const getUpdatedBodyAndExcludeFiles = (multerFiles, body) => {
         item.insert.image.indexOf(process.env.DOMAIN) == -1
       ) {
         item.insert.image =
-          process.env.DOMAIN +
-          "/api/user/getImage" +
-          "/" +
-          includedFilenames[i];
+          process.env.DOMAIN + "/api/getImage" + "/" + includedFilenames[i];
         i++;
       }
       return item;
