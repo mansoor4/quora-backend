@@ -115,7 +115,8 @@ module.exports = {
   getAnswer: async (req, res, next) => {
     try {
       const answer = req.answer;
-      const populatedAnswer = await answer
+
+      await answer
         .populate({
           path: "user",
           model: User,
@@ -134,7 +135,7 @@ module.exports = {
         .execPopulate();
 
       return res.json({
-        answer: populatedAnswer,
+        answer,
       });
     } catch (err) {
       return next(err);

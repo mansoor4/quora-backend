@@ -98,7 +98,7 @@ module.exports = {
     const user = req.profile;
     const nonPopulatedAnswerOfUser = [...user.answers];
     try {
-      const populatedUser = await user
+      await user
         .populate({
           path: "questions",
           model: Question,
@@ -127,7 +127,7 @@ module.exports = {
       });
 
       return res.json({
-        user: populatedUser,
+        user,
       });
     } catch (err) {
       return next(err);
@@ -163,6 +163,7 @@ module.exports = {
       await user
         .populate({
           path: "bookmark",
+          select: "question answers",
           populate: {
             path: "question",
             model: Question,
@@ -218,33 +219,34 @@ module.exports = {
         (obj) => obj.question === questionId
       );
 
-      const selectedBookmark = user.bookmark[bookmarkIndex];
-
-      await selectedBookmark
+      await user
         .populate({
-          path: "question",
-          model: Question,
-          select: "-answers",
+          path: "bookmark",
           populate: {
-            path: "user",
-            model: User,
-            select: "username profileImage.path",
+            path: "question",
+            model: Question,
+            select: "-answers",
+            populate: {
+              path: "user",
+              model: User,
+              select: "username profileImage.path",
+            },
           },
-        })
-        .populate({
-          path: "answers",
-          model: Answer,
-          select: "-question",
           populate: {
-            path: "user",
-            model: User,
-            select: "username profileImage.path",
+            path: "answers",
+            model: Answer,
+            select: "-question",
+            populate: {
+              path: "user",
+              model: User,
+              select: "username profileImage.path",
+            },
           },
         })
         .execPopulate();
 
       return res.json({
-        selectedBookmark,
+        selectedBookmark: user.bookmark[bookmarkIndex],
       });
     } catch (err) {
       return next(err);

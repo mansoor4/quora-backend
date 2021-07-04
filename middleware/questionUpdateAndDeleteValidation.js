@@ -7,7 +7,7 @@ const questionUpdateAndDeleteValidation = async (req, res, next) => {
     const { mode } = req.query;
     const message = mode == "update" ? "Updated" : "Deleted";
 
-    const populatedQuestion = await question
+    await question
       .populate({
         path: "answers",
         model: Answer,
@@ -15,7 +15,7 @@ const questionUpdateAndDeleteValidation = async (req, res, next) => {
       })
       .execPopulate();
 
-    const populatedQuestionAnswers = populatedQuestion.answers;
+    const populatedQuestionAnswers = question.answers;
 
     const filterAnswer = populatedQuestionAnswers.filter(
       (answer) => answer.upVote || answer.verified
