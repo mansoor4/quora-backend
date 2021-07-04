@@ -8,6 +8,7 @@ const {
   getUser,
   addBookmark,
   getBookmarks,
+  deleteBookmark,
   getSpecificQuestionBookmark,
 } = require("../controllers/user");
 
@@ -48,5 +49,5 @@ router.put(
 );
 
 //DELETE
-router.delete("/deleteBookmark", isAuthenticated);
+router.delete("/deleteBookmark/:userId", isAuthenticated, deleteBookmark);
 module.exports = router;
