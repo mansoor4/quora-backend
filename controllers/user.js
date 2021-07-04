@@ -138,7 +138,7 @@ module.exports = {
     const { questionId, answerId } = req.body;
     try {
       const bookmarkIndex = user.bookmark.findIndex(
-        (obj) => obj.question === questionId
+        (obj) => obj.question == questionId
       );
 
       if (bookmarkIndex !== -1) {
@@ -189,7 +189,7 @@ module.exports = {
     const { questionId, answerIds } = req.body;
     try {
       const bookmarkIndex = user.bookmark.findIndex(
-        (obj) => obj.question === questionId
+        (obj) => obj.question == questionId
       );
 
       const selectedBookmark = user.bookmark[bookmarkIndex];
@@ -213,10 +213,10 @@ module.exports = {
   },
   getSpecificQuestionBookmark: async (req, res, next) => {
     const user = req.profile;
-    const { questionId } = req.body;
+    const { questionId } = req.query;
     try {
       const bookmarkIndex = user.bookmark.findIndex(
-        (obj) => obj.question === questionId
+        (obj) => obj.question == questionId
       );
 
       await user
