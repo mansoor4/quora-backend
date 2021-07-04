@@ -137,8 +137,8 @@ module.exports = {
     const user = req.profile;
     const { questionId, answerId } = req.body;
     try {
-      const bookmarkIndex = user.bookmark.findIndex(
-        (obj) => obj.question == questionId
+      const bookmarkIndex = user.bookmark.findIndex((obj) =>
+        obj.question.equals(questionId)
       );
 
       if (bookmarkIndex !== -1) {
@@ -188,8 +188,8 @@ module.exports = {
     const user = req.profile;
     const { questionId, answerIds } = req.body;
     try {
-      const bookmarkIndex = user.bookmark.findIndex(
-        (obj) => obj.question == questionId
+      const bookmarkIndex = user.bookmark.findIndex((obj) =>
+        obj.question.equals(questionId)
       );
 
       const selectedBookmark = user.bookmark[bookmarkIndex];
@@ -215,8 +215,8 @@ module.exports = {
     const user = req.profile;
     const { questionId } = req.query;
     try {
-      const bookmarkIndex = user.bookmark.findIndex(
-        (obj) => obj.question == questionId
+      const bookmarkIndex = user.bookmark.findIndex((obj) =>
+        obj.question.equals(questionId)
       );
 
       await user
