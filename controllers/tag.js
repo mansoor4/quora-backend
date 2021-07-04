@@ -18,9 +18,6 @@ module.exports = {
   getAllAdminTags: async (req, res, next) => {
     try {
       const tags = await Tag.find();
-      if (!tags) {
-        throw error("Error in getting tags", 500);
-      }
 
       return res.json({
         tags,
@@ -33,10 +30,8 @@ module.exports = {
   addTags: async (req, res, next) => {
     try {
       let { tags, tagId } = req.body;
-      const deletedTag = await Tag.findByIdAndRemove(tagId);
-      if (!deletedTag) {
-        throw error("Tags not added try again");
-      }
+      await Tag.findByIdAndRemove(tagId);
+
       const result = await User.addTags(tags);
       if (result) {
         return res.json({

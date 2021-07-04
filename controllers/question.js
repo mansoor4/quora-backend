@@ -1,8 +1,7 @@
 //Import Packages
 
 //Import Utils
-const error = require("../utils/error"),
-  getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
+const getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
   deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
   getFileNamesFromBody = require("../utils/getFileNamesFromBody");
@@ -31,14 +30,9 @@ module.exports = {
         user: userId,
         tags: tags,
       });
-      if (!question) {
-        throw error("Question not created", 500);
-      }
+
       user.questions.push(question);
-      const saveUser = await user.save();
-      if (!saveUser) {
-        throw error("User not saved", 500);
-      }
+      await user.save();
 
       return res.json({
         questionId: question._id,
@@ -74,10 +68,7 @@ module.exports = {
       question.markModified("body");
       question.markModified("tags");
 
-      const saveQuestion = await question.save();
-      if (!saveQuestion) {
-        throw error("Question not saved", 500);
-      }
+      await question.save();
 
       return res.json({
         message: "Question updated successfully",
@@ -107,10 +98,7 @@ module.exports = {
 
       question.markModified("body");
 
-      const saveQuestion = await question.save();
-      if (!saveQuestion) {
-        throw error("Question not saved");
-      }
+      await question.save();
 
       return res.json({
         message:
@@ -139,9 +127,6 @@ module.exports = {
       const answersOfQuestion = await Answer.find({
         _id: { $in: deleteAnswers },
       }).select("body");
-      if (!answersOfQuestion.length) {
-        throw error();
-      }
 
       answersOfQuestion.forEach((answer) => {
         excludedImages = excludedImages.concat(
@@ -153,24 +138,14 @@ module.exports = {
         filenames: excludedImages,
       });
 
-      const deleteQuestion = await question.remove();
-      if (!deleteQuestion) {
-        throw error("Answer Not Deleted");
-      }
+      await question.remove();
 
       user.questions.pull(questionId);
-      const saveUser = await user.save();
-      if (!saveUser) {
-        throw error("User not saved");
-      }
+      await user.save();
 
-      const answerAfterDeletion = await Answer.deleteMany({
+      await Answer.deleteMany({
         _id: { $in: deleteAnswers },
       });
-
-      if (!answerAfterDeletion.ok) {
-        throw error();
-      }
 
       res.json({
         message: "Question Deleted Successfully",
@@ -201,9 +176,6 @@ module.exports = {
         })
         .execPopulate();
 
-      if (!populatedQuestion) {
-        throw error("Question not saved", 500);
-      }
       return res.json({
         question: populatedQuestion,
       });

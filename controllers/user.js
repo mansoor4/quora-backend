@@ -2,8 +2,7 @@
 const _ = require("lodash");
 
 //Import Utils
-const error = require("../utils/error"),
-  environmentVariables = require("../config/environmentVariables");
+const environmentVariables = require("../config/environmentVariables");
 
 //Import Models
 const User = require("../models/user"),
@@ -45,10 +44,8 @@ module.exports = {
           : null,
       });
 
-      const saveUser = await user.save();
-      if (!saveUser) {
-        throw error("User not saved", 500);
-      }
+      await user.save();
+
       return res.json({
         message: "Profile created successfully",
       });
@@ -82,16 +79,14 @@ module.exports = {
         }
         if (user.profileImage.fileName) {
           imageDeleteQueue.add({
-            filenames: new Array(user.profileImage.fileName),
+            filenames: [user.profileImage.fileName],
           });
         }
       }
 
       user = _.extend(user, profile);
-      const saveUser = await user.save();
-      if (!saveUser) {
-        throw error("User not saved", 500);
-      }
+      await user.save();
+
       return res.json({
         message: "Profile Updated Sucessfully",
       });
@@ -100,10 +95,9 @@ module.exports = {
     }
   },
   getUser: async (req, res, next) => {
+    const user = req.profile;
+    const nonPopulatedAnswerOfUser = [...user.answers];
     try {
-      const user = req.profile;
-      const nonPopulatedAnswerOfUser = [...user.answers];
-
       const populatedUser = await user
         .populate({
           path: "questions",
@@ -134,6 +128,120 @@ module.exports = {
 
       return res.json({
         user: populatedUser,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  addBookmark: async (req, res, next) => {
+    const user = req.profile;
+    const { questionId, answerId } = req.body;
+    try {
+      const bookmarkIndex = user.bookmark.findIndex(
+        (obj) => obj.question === questionId
+      );
+
+      if (bookmarkIndex !== -1) {
+        user.bookmark[bookmarkIndex].answers.push(answerId);
+      } else {
+        const newBookmark = { question: questionId, answers: [answerId] };
+        user.bookmark.push(newBookmark);
+      }
+
+      await user.save();
+
+      return res.json({
+        message: "Answer bookmarked successfully ",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  getBookmarks: async (req, res, next) => {
+    const user = req.profile;
+    try {
+      await user.bookmark
+        .populate({
+          path: "question",
+          model: Question,
+          select: "title user",
+          populate: {
+            path: "user",
+            model: User,
+            select: "username profileImage.path",
+          },
+        })
+        .execPopulate();
+
+      return res.json({
+        bookmarks: user.bookmark,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  deleteBookmark: async (req, res, next) => {
+    const user = req.profile;
+    const { questionId, answerIds } = req.body;
+    try {
+      const bookmarkIndex = user.bookmark.findIndex(
+        (obj) => obj.question === questionId
+      );
+
+      const selectedBookmark = user.bookmark[bookmarkIndex];
+      const answersAfterRemove = selectedBookmark.answers.filter(
+        (answer) => answerIds.indexOf(answer) !== -1
+      );
+      if (answersAfterRemove.length) {
+        selectedBookmark.answers = answersAfterRemove;
+        user.bookmark[bookmarkIndex] = selectedBookmark;
+      } else {
+        user.bookmark.pull(selectedBookmark);
+      }
+
+      await user.save();
+      return res.json({
+        message: "Bookmark deleted successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  getSpecificQuestionBookmark: async (req, res, next) => {
+    const user = req.profile;
+    const { questionId } = req.body;
+    try {
+      const bookmarkIndex = user.bookmark.findIndex(
+        (obj) => obj.question === questionId
+      );
+
+      const selectedBookmark = user.bookmark[bookmarkIndex];
+
+      await selectedBookmark
+        .populate({
+          path: "question",
+          model: Question,
+          select: "-answers",
+          populate: {
+            path: "user",
+            model: User,
+            select: "username profileImage.path",
+          },
+        })
+        .populate({
+          path: "answers",
+          model: Answer,
+          select: "-question",
+          populate: {
+            path: "user",
+            model: User,
+            select: "username profileImage.path",
+          },
+        })
+        .execPopulate();
+
+      return res.json({
+        selectedBookmark,
       });
     } catch (err) {
       return next(err);

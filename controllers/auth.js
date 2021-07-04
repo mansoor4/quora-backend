@@ -39,10 +39,6 @@ module.exports = {
         },
       });
 
-      if (!user) {
-        throw error("User not created", 500);
-      }
-
       const token = jwt.sign({ email: email }, process.env.SECRET);
 
       return res.json({
@@ -60,9 +56,7 @@ module.exports = {
       const { role } = req.query;
       const { email } = req.body;
       const user = await User.findOne({ email: email });
-      if (!user) {
-        throw error();
-      }
+
       let payload = {};
       if (role !== "admin") {
         payload = { email: email };
@@ -117,9 +111,6 @@ module.exports = {
             size: null,
           },
         });
-        if (!user) {
-          throw error("User not created", 500);
-        }
       }
       const token = jwt.sign(
         { id: user._id, email: email },

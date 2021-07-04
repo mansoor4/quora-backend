@@ -1,8 +1,7 @@
 //Import Packages
 
 //Import Utils
-const error = require("../utils/error"),
-  getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
+const getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
   deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
   getFileNamesFromBody = require("../utils/getFileNamesFromBody");
@@ -71,10 +70,7 @@ module.exports = {
 
       answer.markModified("body");
 
-      const saveAnswer = await answer.save();
-      if (!saveAnswer) {
-        throw error("Answer not saved", 500);
-      }
+      await answer.save();
 
       return res.json({
         message: "Answer updated successfully",
@@ -104,10 +100,7 @@ module.exports = {
 
       answer.markModified("body");
 
-      const saveAnswer = await answer.save();
-      if (!saveAnswer) {
-        throw error("Answer not saved");
-      }
+      await answer.save();
 
       return res.json({
         message:
@@ -140,9 +133,6 @@ module.exports = {
         })
         .execPopulate();
 
-      if (!populatedAnswer) {
-        throw error("Answer not saved", 500);
-      }
       return res.json({
         answer: populatedAnswer,
       });
@@ -168,24 +158,17 @@ module.exports = {
         filenames: excludeImages,
       });
 
-      const deleteAnswer = await answer.remove();
-      if (!deleteAnswer) {
-        throw error("Answer Not Deleted");
-      }
+      await answer.remove();
 
       user.answers.pull(answerId);
       user.markModified("answers");
-      const saveUser = await user.save();
-      if (!saveUser) {
-        throw error("User Not Saved");
-      }
+
+      await user.save();
 
       question.answers.pull(answerId);
       question.markModified("answers");
-      const saveQuestion = await question.save();
-      if (!saveQuestion) {
-        throw error("Question not Saved");
-      }
+
+      await question.save();
 
       res.json({
         message: "Answer Deleted Successfully",

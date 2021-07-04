@@ -43,7 +43,6 @@ router.put(
   questionUpdateAndDeleteValidation,
   updateQuestion
 );
-
 router.put(
   "/updateQuestionVote/:questionId",
   isAuthenticated,

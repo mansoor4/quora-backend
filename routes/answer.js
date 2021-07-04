@@ -43,7 +43,6 @@ router.put(
   isAuthenticated,
   updateAnswer
 );
-
 router.put("/updateAnswerVote/:answerId", isAuthenticated, updateAnswerVote);
 
 //DELETE

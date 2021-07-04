@@ -3,10 +3,12 @@ const express = require("express"),
 
 //Importing Controllers
 const {
-  getImage,
   createProfile,
   updateProfile,
   getUser,
+  addBookmark,
+  getBookmarks,
+  getSpecificQuestionBookmark,
 } = require("../controllers/user");
 
 //Importing Middlewares
@@ -21,7 +23,12 @@ router.param("userId", getUserById);
 
 //GET
 router.get("/getUser/:userId", isAuthenticated, getUser);
-
+router.get("/getBookmarks/:userId", isAuthenticated, getBookmarks);
+router.get(
+  "/getSpecificQuestionBookmark/:userId",
+  isAuthenticated,
+  getSpecificQuestionBookmark
+);
 
 //POST
 router.post(
@@ -30,6 +37,7 @@ router.post(
   multerUpload,
   createProfile
 );
+router.post("/addBookmark/:userId", isAuthenticated, addBookmark);
 
 //PUT
 router.put(
@@ -40,5 +48,5 @@ router.put(
 );
 
 //DELETE
-
+router.delete("/deleteBookmark", isAuthenticated);
 module.exports = router;

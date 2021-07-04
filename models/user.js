@@ -89,6 +89,12 @@ const userSchema = new mongoose.Schema(
     },
     answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }],
+    bookmark: [
+      {
+        question: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
+        answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
+      },
+    ],
     admin: {
       type: Boolean,
       default: false,
