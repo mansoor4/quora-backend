@@ -1,5 +1,8 @@
 //Import Packages
-const _ = require("lodash");
+const _ = require("lodash"),
+  {
+    Types: { ObjectId },
+  } = require("mongoose");
 
 //Import Utils
 const environmentVariables = require("../config/environmentVariables");
@@ -138,7 +141,7 @@ module.exports = {
     const { questionId, answerId } = req.body;
     try {
       const bookmarkIndex = user.bookmark.findIndex((obj) =>
-        obj.question.equals(questionId)
+        obj.question.equals(ObjectId(questionId))
       );
 
       if (bookmarkIndex !== -1) {
@@ -189,7 +192,7 @@ module.exports = {
     const { questionId, answerIds } = req.body;
     try {
       const bookmarkIndex = user.bookmark.findIndex((obj) =>
-        obj.question.equals(questionId)
+        obj.question.equals(ObjectId(questionId))
       );
 
       const selectedBookmark = user.bookmark[bookmarkIndex];
@@ -216,7 +219,7 @@ module.exports = {
     const { questionId } = req.query;
     try {
       const bookmarkIndex = user.bookmark.findIndex((obj) =>
-        obj.question.equals(questionId)
+        obj.question.equals(ObjectId(questionId))
       );
 
       await user
