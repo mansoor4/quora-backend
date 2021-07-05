@@ -1,7 +1,7 @@
 //Import Packages
 const _ = require("lodash"),
   {
-    Types: { ObjectId },
+    mongo: { ObjectId },
   } = require("mongoose");
 
 //Import Utils
@@ -141,7 +141,7 @@ module.exports = {
     const { questionId, answerId } = req.body;
     try {
       const bookmarkIndex = user.bookmark.findIndex((obj) =>
-        obj.question.equals(ObjectId(questionId))
+        obj.question.equals(questionId)
       );
 
       if (bookmarkIndex !== -1) {
@@ -192,7 +192,7 @@ module.exports = {
     const { questionId, answerIds } = req.body;
     try {
       const bookmarkIndex = user.bookmark.findIndex((obj) =>
-        obj.question.equals(ObjectId(questionId))
+        obj.question.equals(questionId)
       );
 
       const selectedBookmark = user.bookmark[bookmarkIndex];
