@@ -1,3 +1,5 @@
+const error = require("../utils/error");
+
 const answerDeleteFromUserProcess = async ({ data }) => {
   try {
     const { user, nonPopulatedAnswerOfUser } = data;
@@ -9,9 +11,11 @@ const answerDeleteFromUserProcess = async ({ data }) => {
       user.markModified("answers");
       const saveUser = await user.save();
       if (!saveUser) {
-        throw error(`Answers Not Delete From User ${user._id}`);
+        throw error(
+          `Answers Not Delete From User ${user._id}, Some error occurred`
+        );
       }
-      message = "Answers Deleted Successfully From User";
+      message = `Answers Deleted Successfully From User ${user._id}`;
     }
 
     return message;

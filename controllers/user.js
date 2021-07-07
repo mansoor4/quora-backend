@@ -1,11 +1,10 @@
 //Import Packages
-const _ = require("lodash"),
-  {
-    mongo: { ObjectId },
-  } = require("mongoose");
+const _ = require("lodash");
 
 //Import Utils
-const environmentVariables = require("../config/environmentVariables");
+const error = require("../utils/error"),
+  environmentVariables = require("../config/environmentVariables"),
+  sanitizeBookmarks = require("../utils/sanitizeBookmarks");
 
 //Import Models
 const User = require("../models/user"),
@@ -14,7 +13,8 @@ const User = require("../models/user"),
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete"),
-  answerDeleteFromUserQueue = require("../queues/answerDeleteFromUser");
+  answerDeleteFromUserQueue = require("../queues/answerDeleteFromUser"),
+  removeQuestionAndAnswerFromBookmarkQueue = require("../queues/removeQuestionAndAnswerFromBookmark");
 
 //Configure Environment variables
 environmentVariables();
@@ -140,15 +140,15 @@ module.exports = {
     const user = req.profile;
     const { questionId, answerId } = req.body;
     try {
-      const bookmarkIndex = user.bookmark.findIndex((obj) =>
+      const bookmarkIndex = user.bookmarks.findIndex((obj) =>
         obj.question.equals(questionId)
       );
 
       if (bookmarkIndex !== -1) {
-        user.bookmark[bookmarkIndex].answers.push(answerId);
+        user.bookmarks[bookmarkIndex].answers.push(answerId);
       } else {
         const newBookmark = { question: questionId, answers: [answerId] };
-        user.bookmark.push(newBookmark);
+        user.bookmarks.push(newBookmark);
       }
 
       await user.save();
@@ -162,10 +162,11 @@ module.exports = {
   },
   getBookmarks: async (req, res, next) => {
     const user = req.profile;
+    const nonSanitizeBookmark = user.bookmarks;
     try {
       await user
         .populate({
-          path: "bookmark",
+          path: "bookmarks",
           select: "question answers",
           populate: {
             path: "question",
@@ -177,11 +178,24 @@ module.exports = {
               select: "username profileImage.path",
             },
           },
+          populate: {
+            path: "answers",
+            model: Answer,
+            select: "_id",
+          },
         })
         .execPopulate();
 
+      const sanitizedBookmarks = sanitizeBookmarks(user.bookmarks);
+
+      removeQuestionAndAnswerFromBookmarkQueue.add({
+        nonSanitizeBookmark,
+        sanitizeBookmarks,
+        user,
+      });
+
       return res.json({
-        bookmarks: user.bookmark,
+        bookmarks: sanitizedBookmarks,
       });
     } catch (err) {
       return next(err);
@@ -191,19 +205,20 @@ module.exports = {
     const user = req.profile;
     const { questionId, answerIds } = req.body;
     try {
-      const bookmarkIndex = user.bookmark.findIndex((obj) =>
+      const bookmarkIndex = user.bookmarks.findIndex((obj) =>
         obj.question.equals(questionId)
       );
 
-      const selectedBookmark = user.bookmark[bookmarkIndex];
+      const selectedBookmark = user.bookmarks[bookmarkIndex];
       const answersAfterRemove = selectedBookmark.answers.filter(
         (answer) => answerIds.indexOf(answer) !== -1
       );
+
       if (answersAfterRemove.length) {
         selectedBookmark.answers = answersAfterRemove;
-        user.bookmark[bookmarkIndex] = selectedBookmark;
+        user.bookmarks[bookmarkIndex] = selectedBookmark;
       } else {
-        user.bookmark.pull(selectedBookmark);
+        user.bookmarks.pull(selectedBookmark);
       }
 
       await user.save();
@@ -218,13 +233,13 @@ module.exports = {
     const user = req.profile;
     const { questionId } = req.query;
     try {
-      const bookmarkIndex = user.bookmark.findIndex((obj) =>
-        obj.question.equals(ObjectId(questionId))
+      const bookmarkIndex = user.bookmarks.findIndex((obj) =>
+        obj.question.equals(questionId)
       );
 
       await user
         .populate({
-          path: "bookmark",
+          path: "bookmarks",
           populate: {
             path: "question",
             model: Question,
@@ -248,8 +263,53 @@ module.exports = {
         })
         .execPopulate();
 
+      const selectedBookmark = user.bookmarks[bookmarkIndex];
+      const question = selectedBookmark.question;
+      const answers = selectedBookmark.answer;
+
+      if (!question) {
+        throw error("Question not found", 404);
+      }
+
+      if (!answers.length) {
+        throw error("No Bookmarks are present", 404);
+      }
+
       return res.json({
-        selectedBookmark: user.bookmark[bookmarkIndex],
+        selectedBookmark,
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  connectUser: async (req, res, next) => {
+    const userToConnect = req.profile;
+    const { Id } = req.body;
+    const { userId } = req.params;
+    try {
+      const user = await User.findOne({ _id: Id }).select("-password -salt");
+      if (!user) {
+        throw error("User not found", 404);
+      }
+
+      const index = user.followings.findIndex((followingUser) =>
+        followingUser.equals(userId)
+      );
+
+      if (index !== -1) {
+        user.followings.pull(userId);
+        userToConnect.followers.pull(Id);
+      } else {
+        user.followings.push(userId);
+        userToConnect.followers.push(Id);
+      }
+
+      await user.save();
+
+      await userToConnect.save();
+
+      return res.json({
+        message: "Done",
       });
     } catch (err) {
       return next(err);

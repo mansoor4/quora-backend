@@ -48,6 +48,8 @@ router.put(
   updateProfile
 );
 
+router.put("/connectUser/:userId",isAuthenticated)
+
 //DELETE
 router.delete("/deleteBookmark/:userId", isAuthenticated, deleteBookmark);
 module.exports = router;

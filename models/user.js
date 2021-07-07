@@ -89,12 +89,14 @@ const userSchema = new mongoose.Schema(
     },
     answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }],
-    bookmark: [
+    bookmarks: [
       {
         question: { type: mongoose.Schema.Types.ObjectId, ref: "Question" },
         answers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Answer" }],
       },
     ],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    followings: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     admin: {
       type: Boolean,
       default: false,
