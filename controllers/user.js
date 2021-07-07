@@ -162,7 +162,7 @@ module.exports = {
   },
   getBookmarks: async (req, res, next) => {
     const user = req.profile;
-    const nonSanitizeBookmark = user.bookmarks;
+    const nonSanitizedBookmarks = _.cloneDeep(user.bookmarks);
     try {
       await user
         .populate({
@@ -189,8 +189,8 @@ module.exports = {
       const sanitizedBookmarks = sanitizeBookmarks(user.bookmarks);
 
       removeQuestionAndAnswerFromBookmarkQueue.add({
-        nonSanitizeBookmark,
-        sanitizeBookmarks,
+        nonSanitizedBookmarks,
+        sanitizedBookmarks,
         user,
       });
 

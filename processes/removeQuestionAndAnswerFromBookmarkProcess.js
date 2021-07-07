@@ -2,13 +2,13 @@ const error = require("../utils/error");
 
 const removeQuestionAndAnswerFromBookmarkProcess = async ({ data }) => {
   try {
-    const { nonSanitizeBookmark, sanitizeBookmarks, user } = data;
-    let update = nonSanitizeBookmark.length !== sanitizeBookmarks.length;
+    const { nonSanitizedBookmarks, sanitizedBookmarks, user } = data;
+    let update = nonSanitizedBookmarks.length !== sanitizedBookmarks.length;
     let message = `There is nothing to update in  user ${user._id} bookmarks`;
 
     if (!update) {
-      for (let i = 0; i < nonSanitizeBookmark.length; i++) {
-        if (nonSanitizeBookmark[i].answers !== sanitizeBookmarks[i].answers) {
+      for (let i = 0; i < nonSanitizedBookmarks.length; i++) {
+        if (nonSanitizedBookmarks[i].answers !== sanitizedBookmarks[i].answers) {
           update = true;
           break;
         }
@@ -16,7 +16,7 @@ const removeQuestionAndAnswerFromBookmarkProcess = async ({ data }) => {
     }
 
     if (update) {
-      user.bookmarks = sanitizeBookmarks;
+      user.bookmarks = sanitizedBookmarks;
       user.markModified("bookmarks");
       const saveUser = await user.save();
       if (!saveUser) {
