@@ -240,6 +240,7 @@ module.exports = {
       await user
         .populate({
           path: "bookmarks",
+          select: "question answers",
           populate: {
             path: "question",
             model: Question,
@@ -265,7 +266,7 @@ module.exports = {
 
       const selectedBookmark = user.bookmarks[bookmarkIndex];
       const question = selectedBookmark.question;
-      const answers = selectedBookmark.answer;
+      const answers = selectedBookmark.answers;
 
       if (!question) {
         throw error("Question not found", 404);
