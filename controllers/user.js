@@ -99,6 +99,7 @@ module.exports = {
   },
   getUser: async (req, res, next) => {
     const user = req.profile;
+    const { userId } = req.params;
     const nonPopulatedAnswerOfUser = [...user.answers];
     try {
       await user
@@ -124,9 +125,11 @@ module.exports = {
         })
         .execPopulate();
 
+      const populatedAnswerOfUser = [...user.answers];
       answerDeleteFromUserQueue.add({
         nonPopulatedAnswerOfUser,
-        user,
+        populatedAnswerOfUser,
+        userId,
       });
 
       return res.json({
@@ -162,6 +165,7 @@ module.exports = {
   },
   getBookmarks: async (req, res, next) => {
     const user = req.profile;
+    const { userId } = req.params;
     const nonSanitizedBookmarks = _.cloneDeep(user.bookmarks);
     try {
       await user
@@ -196,7 +200,7 @@ module.exports = {
       removeQuestionAndAnswerFromBookmarkQueue.add({
         nonSanitizedBookmarks,
         sanitizedBookmarks,
-        user,
+        userId,
       });
 
       return res.json({
