@@ -10,6 +10,7 @@ const {
   getBookmarks,
   deleteBookmark,
   getSpecificQuestionBookmark,
+  connectUser,
 } = require("../controllers/user");
 
 //Importing Middlewares
@@ -48,7 +49,7 @@ router.put(
   updateProfile
 );
 
-router.put("/connectUser/:userId",isAuthenticated)
+router.put("/connectUser/:userId", isAuthenticated, connectUser);
 
 //DELETE
 router.delete("/deleteBookmark/:userId", isAuthenticated, deleteBookmark);

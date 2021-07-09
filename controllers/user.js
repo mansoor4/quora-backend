@@ -167,7 +167,6 @@ module.exports = {
       await user
         .populate({
           path: "bookmarks",
-          select: "question answers",
           populate: {
             path: "question",
             model: Question,
@@ -178,6 +177,12 @@ module.exports = {
               select: "username profileImage.path",
             },
           },
+        })
+        .execPopulate();
+
+      await user
+        .populate({
+          path: "bookmarks",
           populate: {
             path: "answers",
             model: Answer,
@@ -211,7 +216,8 @@ module.exports = {
 
       const selectedBookmark = user.bookmarks[bookmarkIndex];
       const answersAfterRemove = selectedBookmark.answers.filter(
-        (answer) => answerIds.indexOf(answer) !== -1
+        (answer) =>
+          answerIds.findIndex((answerId) => answer.equals(answerId)) === -1
       );
 
       if (answersAfterRemove.length) {
@@ -251,6 +257,12 @@ module.exports = {
               select: "username profileImage.path",
             },
           },
+        })
+        .execPopulate();
+
+      await user
+        .populate({
+          path: "bookmarks",
           populate: {
             path: "answers",
             model: Answer,
