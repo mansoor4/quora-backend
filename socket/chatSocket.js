@@ -1,7 +1,9 @@
 const connectSocket = require("../config/socket");
 
 const chatSocket = () => {
-  connectSocket((socket, io) => {});
+  connectSocket((socket, io) => {
+      
+  });
 };
 
 module.exports = chatSocket;

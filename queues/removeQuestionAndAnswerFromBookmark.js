@@ -11,8 +11,4 @@ removeQuestionAndAnswerFromBookmark.process(
   removeQuestionAndAnswerFromBookmarkProcess
 );
 
-// imageDelete.on("completed", (job) => {
-//   console.log(job);
-// });
-
 module.exports = removeQuestionAndAnswerFromBookmark;
