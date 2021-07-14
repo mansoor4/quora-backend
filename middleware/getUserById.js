@@ -6,8 +6,11 @@ const User = require("../models/user"),
 
 const getUserById = async (req, res, next, id) => {
   try {
-    const isValid = new ObjectId(id) == id;
-    console.log(isValid);
+    let isValid = false;
+    if (ObjectId.isValid(id)) {
+      isValid = new ObjectId(id) == id;
+    }
+
     let options = { _id: id };
     if (!isValid) {
       options = { username: id };

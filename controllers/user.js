@@ -28,8 +28,7 @@ module.exports = {
       college = college.trim();
       contact = contact.trim();
       username = username.trim();
-      console.log(req.files[0]);
-      
+
       let user = req.profile;
       user = _.extend(user, {
         username,
@@ -58,6 +57,9 @@ module.exports = {
         message: "Profile created successfully",
       });
     } catch (err) {
+      if (err.code === 11000 && err.message.indexOf("username_1") > -1) {
+        return next(error("This username is already taken", 422));
+      }
       return next(err);
     }
   },
