@@ -23,11 +23,16 @@ environmentVariables();
 module.exports = {
   createProfile: async (req, res, next) => {
     try {
-      let { branch, year, contact, college } = req.body;
+      let { branch, year, contact, college, username } = req.body;
+
       college = college.trim();
       contact = contact.trim();
+      username = username.trim();
+      console.log(req.files[0]);
+      
       let user = req.profile;
       user = _.extend(user, {
+        username,
         branch,
         year,
         college,
@@ -59,10 +64,11 @@ module.exports = {
   updateProfile: async (req, res, next) => {
     try {
       let user = req.profile;
-      let { branch, year, username, college } = req.body;
-      username = username.trim();
+      let { branch, year, name, college } = req.body;
+      name = name.trim();
       college = college.trim();
-      let profile = { branch, year, username, college };
+
+      let profile = { branch, year, name, college };
 
       if (req.files[0]) {
         if (!(req.files[0].originalname === user.profileImage.originalName)) {
@@ -99,7 +105,6 @@ module.exports = {
   },
   getUser: async (req, res, next) => {
     const user = req.profile;
-    const { userId } = req.params;
     const nonPopulatedAnswerOfUser = [...user.answers];
     try {
       await user
@@ -119,7 +124,7 @@ module.exports = {
             populate: {
               path: "user",
               model: User,
-              select: "username profileImage.path",
+              select: "name username profileImage.path",
             },
           },
         })
@@ -129,7 +134,7 @@ module.exports = {
       answerDeleteFromUserQueue.add({
         nonPopulatedAnswerOfUser,
         populatedAnswerOfUser,
-        userId,
+        userId: user._id,
       });
 
       return res.json({
@@ -178,7 +183,7 @@ module.exports = {
             populate: {
               path: "user",
               model: User,
-              select: "username profileImage.path",
+              select: "name username profileImage.path",
             },
           },
         })
@@ -258,7 +263,7 @@ module.exports = {
             populate: {
               path: "user",
               model: User,
-              select: "username profileImage.path",
+              select: "name username profileImage.path",
             },
           },
         })
@@ -274,7 +279,7 @@ module.exports = {
             populate: {
               path: "user",
               model: User,
-              select: "username profileImage.path",
+              select: "name username profileImage.path",
             },
           },
         })

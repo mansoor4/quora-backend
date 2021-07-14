@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
+      unique: true,
+    },
+    name: {
+      type: String,
       required: true,
     },
     branch: {
@@ -97,6 +101,24 @@ const userSchema = new mongoose.Schema(
     ],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     followings: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    chats: [
+      {
+        toUser: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        connectionId: {
+          type: "String",
+          required: true,
+        },
+        chatContent: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Chat",
+          default: null,
+        },
+      },
+    ],
     admin: {
       type: Boolean,
       default: false,

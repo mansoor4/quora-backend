@@ -4,14 +4,14 @@ const express = require("express"),
   error = require("./utils/error"),
   connectWithMongoDB = require("./config/mongodb");
 
-//Importing Sockets
-const tagSocket = require("./socket/tagSocket");
+//Importing Socket
+const indexSocket = require("./socket");
 
 //Server
 const { server, app } = require("./config/server.js");
 
 //Sockets
-tagSocket();
+indexSocket();
 
 // Global Middlewares
 app.use((req, res, next) => {

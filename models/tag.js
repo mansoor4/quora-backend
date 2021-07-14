@@ -11,6 +11,10 @@ const tagSchema = new mongoose.Schema(
         type: String,
         default: null,
       },
+      name: {
+        type: String,
+        required: true,
+      },
       username: {
         type: String,
         required: true,

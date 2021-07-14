@@ -163,7 +163,7 @@ module.exports = {
         .populate({
           path: "user",
           model: User,
-          select: "username profileImage.path",
+          select: "name username profileImage.path",
         })
         .populate({
           path: "answers",
@@ -172,7 +172,7 @@ module.exports = {
           populate: {
             path: "user",
             model: User,
-            select: "username profileImage.path",
+            select: "name username profileImage.path",
           },
         })
         .execPopulate();
@@ -194,12 +194,9 @@ module.exports = {
     try {
       if (type === "up") {
         if (downVote) {
-          //pull userid from downVote
-          //push userId in upVote
           question.downVote.pull(userId);
         } else {
           if (upVote) {
-            //pull userid from upVote
             upPush = false;
           }
         }
@@ -210,12 +207,9 @@ module.exports = {
         }
       } else {
         if (upVote) {
-          //pull userid from upVote
-          //push userId in downVote
           question.upVote.pull(userId);
         } else {
           if (downVote) {
-            //pull userid from downVote
             downPush = false;
           }
         }

@@ -10,6 +10,7 @@ const connectWithMongoDB = async (server) => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: false,
+      useCreateIndex: true,
     });
     console.log("MongoDB Connected");
     await server.listen(process.env.PORT);

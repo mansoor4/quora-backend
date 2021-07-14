@@ -17,10 +17,11 @@ const {
 const multerUpload = require("../middleware/multerUpload"),
   isAuthenticated = require("../middleware/isAuthenticated"),
   getUserById = require("../middleware/getUserById");
+// getUserByUsername = require("../middleware/getUserByUsername");
 
 //Params Middlewares
 router.param("userId", getUserById);
-
+// router.param("username", getUserByUsername);
 //Routers
 
 //GET

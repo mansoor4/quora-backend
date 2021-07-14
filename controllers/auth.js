@@ -12,7 +12,7 @@ environmentVariables();
 module.exports = {
   signup: async (req, res, next) => {
     try {
-      let { username, email, password } = req.body;
+      let { name, email, password } = req.body;
 
       const salt = randomBytes(16).toString("hex");
 
@@ -27,7 +27,7 @@ module.exports = {
       password = hashPassword;
 
       const user = await User.create({
-        username: username,
+        name: name,
         email: email,
         password: password,
         salt: salt,
@@ -102,7 +102,7 @@ module.exports = {
       if (!user) {
         user = await User.create({
           email: email,
-          username: name,
+          name: name,
           emailVerify: verified_email,
           profileImage: {
             path: picture,

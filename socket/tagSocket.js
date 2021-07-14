@@ -1,25 +1,22 @@
-const connectSocket = require("../config/socket"),
-  Tag = require("../models/tag"),
+const Tag = require("../models/tag"),
   sanitizeTags = require("../utils/sanitizeTags");
 
-const tagSocket = () => {
-  connectSocket((socket, io) => {
-    socket.on("addTag", async (payload) => {
-      try {
-        const { tags, profileImage, username } = payload;
-        const sanitizedTags = sanitizeTags(tags);
-        if (sanitizedTags.length) {
-          const newTag = {
-            tags: sanitizedTags,
-            user: { profileImage, username },
-          };
-          const tag = await Tag.create(newTag);
-          io.emit("getTag", { tag: tag });
-        }
-      } catch (err) {
-        console.log(err);
+const tagSocket = (socket, io) => {
+  socket.on("addTag", async (payload) => {
+    try {
+      const { tags, profileImage, name, username } = payload;
+      const sanitizedTags = sanitizeTags(tags);
+      if (sanitizedTags.length) {
+        const newTag = {
+          tags: sanitizedTags,
+          user: { profileImage, name, username },
+        };
+        const tag = await Tag.create(newTag);
+        io.emit("getTag", { tag: tag });
       }
-    });
+    } catch (err) {
+      console.log(err);
+    }
   });
 };
 

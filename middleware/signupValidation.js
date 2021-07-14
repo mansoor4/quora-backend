@@ -5,14 +5,14 @@ const { isEmpty, isEmail, normalizeEmail, isLength } = require("validator"),
 const signupValidation = async (req, res, next) => {
   try {
     //Trim Whitespaces From Field
-    req.body.username = req.body.username.trim();
+    req.body.name = req.body.name.trim();
     req.body.email = req.body.email.trim();
     req.body.password = req.body.password.trim();
 
-    let { email, username, password } = req.body;
+    let { email, name, password } = req.body;
 
     //Check Empty Fields
-    if (isEmpty(username) || isEmpty(email)) {
+    if (isEmpty(name) || isEmpty(email)) {
       throw error("Fill all the input fields", 422);
     }
 
