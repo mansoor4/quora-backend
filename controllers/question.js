@@ -266,9 +266,8 @@ module.exports = {
 
     try {
       const newComment = {
-        user: user,
-        text: text,
-        replies: [],
+        user,
+        text,
       };
       question.comments.push(newComment);
 
@@ -287,7 +286,8 @@ module.exports = {
     const { text, user } = req.body;
 
     try {
-      const newReply = { user: user, text: text };
+      const newReply = { user, text };
+
       const commentIndex = question.comments.findIndex((comment) =>
         comment._id.equals(commentId)
       );
@@ -302,6 +302,106 @@ module.exports = {
 
       return res.json({
         message: "Replied successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  updateComment: async (req, res, next) => {
+    const question = req.question;
+    const { commentId } = req.params;
+    const { text } = req.body;
+
+    try {
+      const commentIndex = question.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      question.comments[commentIndex] = {
+        ...question.comments[commentIndex],
+        text,
+      };
+
+      await question.save();
+
+      return res.json({
+        message: "Comment update successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  updateReply: async (req, res, next) => {
+    const question = req.question;
+    const { commentId, replyId } = req.params;
+    const { text } = req.body;
+
+    try {
+      const commentIndex = question.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      if (commentIndex === -1) {
+        throw error("Comment not found", 404);
+      }
+
+      const replyIndex = question.comments[commentIndex].replies.findIndex(
+        (reply) => reply._id.equals(replyId)
+      );
+
+      question.comments[commentIndex].replies[replyIndex] = {
+        ...question.comments[commentIndex].replies[replyIndex],
+        text,
+      };
+
+      await question.save();
+
+      return res.json({
+        message: "Reply updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  deleteComment: async (req, res, next) => {
+    const question = req.question;
+    const { commentId } = req.params;
+
+    try {
+      question.comments = question.comments.filter(
+        (comment) => !comment._id.equals(commentId)
+      );
+
+      await question.save();
+
+      return res.json({
+        message: "Comment deleted successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  deleteReply: async (req, res, next) => {
+    const question = req.question;
+    const { commentId, replyId } = req.params;
+    try {
+      const commentIndex = question.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      if (commentIndex === -1) {
+        throw error("Comment not found", 404);
+      }
+
+      question.comments[commentIndex].replies = question.comments[
+        commentIndex
+      ].replies.filter((reply) => !reply._id.equals(replyId));
+
+      await question.save();
+
+      return res.json({
+        message: "Reply deleted successfully",
       });
     } catch (err) {
       return next(err);

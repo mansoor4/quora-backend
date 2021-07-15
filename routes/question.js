@@ -11,6 +11,10 @@ const {
   updateQuestionVote,
   addComment,
   addReply,
+  updateComment,
+  updateReply,
+  deleteComment,
+  deleteReply,
 } = require("../controllers/question");
 
 //Importing Middlewares
@@ -54,12 +58,34 @@ router.put(
   updateQuestionVote
 );
 
+router.put(
+  "/updateComment/:questionId/:commentId",
+  isAuthenticated,
+  updateComment
+);
+router.put(
+  "/updateReply/:questionId/:commentId/:replyId",
+  isAuthenticated,
+  updateReply
+);
+
 //DELETE
 router.delete(
   "/deleteQuestion/:userId/:questionId",
   isAuthenticated,
   questionUpdateAndDeleteValidation,
   deleteQuestion
+);
+
+router.delete(
+  "/deleteComment/:questionId/:commentId",
+  isAuthenticated,
+  deleteComment
+);
+router.delete(
+  "/deleteReply/:questionId/:commentId/:replyId",
+  isAuthenticated,
+  deleteReply
 );
 
 module.exports = router;

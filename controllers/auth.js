@@ -12,7 +12,7 @@ environmentVariables();
 module.exports = {
   signup: async (req, res, next) => {
     try {
-      let { name, email, password } = req.body;
+      let { name, email, password, firebaseToken } = req.body;
 
       const salt = randomBytes(16).toString("hex");
 
@@ -37,6 +37,7 @@ module.exports = {
           fileName: null,
           size: null,
         },
+        tokens: [firebaseToken],
       });
 
       const token = jwt.sign({ email: email }, process.env.SECRET);
