@@ -38,7 +38,7 @@ router.post(
   questionImagesUpload
 );
 
-router.post("/addComment/:questionId/", isAuthenticated, addComment);
+router.post("/addComment/:questionId", isAuthenticated, addComment);
 router.post("/addReply/:questionId/:commentId", isAuthenticated, addReply);
 
 //PUT
