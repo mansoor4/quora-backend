@@ -17,11 +17,12 @@ const commentContentSchema = new mongoose.Schema({
 });
 const commentSchema = new mongoose.Schema(
   {
-    commentContentSchema,
     replies: [{ type: commentContentSchema }],
   },
   { timestamps: true }
 );
+
+commentSchema.add(commentContentSchema);
 
 // module.exports = mongoose.model("Comment", commentSchema);
 
