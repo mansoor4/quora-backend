@@ -96,7 +96,7 @@ module.exports = {
 
   googleLogin: async (req, res, next) => {
     try {
-      const { id_token, access_token } = req.body;
+      const { id_token, access_token, firebaseToken } = req.body;
 
       const userData = await axios.get(
         `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`,
@@ -122,6 +122,17 @@ module.exports = {
           },
         });
       }
+
+      if (firebaseToken) {
+        const tokenIndex = user.tokens.findIndex(
+          (token) => token === firebaseToken
+        );
+        if (tokenIndex === -1) {
+          user.tokens.push(firebaseToken);
+          await user.save();
+        }
+      }
+
       const token = jwt.sign(
         { id: user._id, email: email },
         process.env.SECRET

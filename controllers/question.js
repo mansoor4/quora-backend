@@ -156,8 +156,16 @@ module.exports = {
   },
 
   getQuestion: async (req, res, next) => {
+    const question = req.question;
+    const { userId } = req.params;
+
     try {
-      const question = req.question;
+      const userIndex = question.views.findIndex((user) => user.equals(userId));
+
+      if (userIndex === -1) {
+        question.views.push(userId);
+        await question.save();
+      }
 
       await question
         .populate({
@@ -255,13 +263,14 @@ module.exports = {
 
     try {
       const newComment = {
-        text,
-        user,
+        user: user,
+        text: text,
         replies: [],
       };
       question.comments.push(newComment);
 
       await question.save();
+
       return res.json({
         message: "Comment successfully",
       });
@@ -275,7 +284,7 @@ module.exports = {
     const { text, user } = req.body;
 
     try {
-      const newReply = { text, user };
+      const newReply = { user: user, text: text };
       const commentIndex = question.comments.findIndex((comment) =>
         comment._id.equals(commentId)
       );
@@ -287,6 +296,7 @@ module.exports = {
       question.comments[commentIndex].replies.push(newReply);
 
       await question.save();
+
       return res.json({
         message: "Replied successfully",
       });
