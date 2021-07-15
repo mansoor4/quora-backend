@@ -175,6 +175,28 @@ module.exports = {
             select: "name username profileImage.path",
           },
         })
+        .populate({
+          path: "comments",
+          populate: {
+            path: "comment",
+            populate: {
+              path: "user",
+              model: User,
+              select: "name username profileImage.path",
+            },
+          },
+        })
+        .populate({
+          path: "comments",
+          populate: {
+            path: "replies",
+            populate: {
+              path: "user",
+              model: User,
+              select: "name username profileImage.path",
+            },
+          },
+        })
         .execPopulate();
 
       return res.json({
@@ -224,6 +246,51 @@ module.exports = {
 
       return res.json({
         message: "Vote updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  addComment: async (req, res, next) => {
+    const question = req.question;
+    const { text, userId } = req.body;
+
+    try {
+      const newComment = {
+        comment: { text, userId },
+        replies: [],
+      };
+      question.comments.push(newComment);
+
+      await question.save();
+      return res.json({
+        message: "Comment successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  addReply: async (req, res, next) => {
+    const question = req.question;
+    const { commentId } = req.params;
+    const { text, userId } = req.body;
+
+    try {
+      const newReply = { text, userId };
+      const commentIndex = question.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      if (commentIndex === -1) {
+        throw error("Comment not found", 404);
+      }
+
+      question.comments[commentIndex].replies.push(newReply);
+
+      await question.save();
+      return res.json({
+        message: "Replied successfully",
       });
     } catch (err) {
       return next(err);

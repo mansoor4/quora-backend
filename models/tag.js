@@ -6,15 +6,18 @@ const tagSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+
     user: {
       profileImage: {
         type: String,
         default: null,
       },
+
       name: {
         type: String,
         required: true,
       },
+
       username: {
         type: String,
         required: true,

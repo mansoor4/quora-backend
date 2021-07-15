@@ -9,6 +9,8 @@ const {
   deleteQuestion,
   questionImagesUpload,
   updateQuestionVote,
+  addComment,
+  addReply,
 } = require("../controllers/question");
 
 //Importing Middlewares
@@ -35,6 +37,9 @@ router.post(
   multerUpload,
   questionImagesUpload
 );
+
+router.post("/addComment/:questionId/", isAuthenticated, addComment);
+router.post("/addReply/:questionId/:commentId", isAuthenticated, addReply);
 
 //PUT
 router.put(

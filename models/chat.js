@@ -5,6 +5,7 @@ const chatContentSchema = new mongoose.Schema({
     type: "String",
     required: true,
   },
+
   status: {
     type: "String",
     enum: ["sending", "send", "seen"],
@@ -16,6 +17,7 @@ const chatSchema = new mongoose.Schema({
   messages: [
     {
       content: { type: chatContentSchema, required: true },
+
       replyTo: { type: chatContentSchema, default: null },
     },
   ],
