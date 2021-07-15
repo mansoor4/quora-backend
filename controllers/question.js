@@ -191,18 +191,19 @@ module.exports = {
             select: "name username profileImage.path",
           },
         })
-        .populate({
-          path: "comments",
-          populate: {
-            path: "replies",
-            populate: {
-              path: "user",
-              model: User,
-              select: "name username profileImage.path",
-            },
-          },
-        })
         .execPopulate();
+
+      await question.populate({
+        path: "comments",
+        populate: {
+          path: "replies",
+          populate: {
+            path: "user",
+            model: User,
+            select: "name username profileImage.path",
+          },
+        },
+      });
 
       return res.json({
         question,
