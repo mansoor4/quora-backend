@@ -160,7 +160,7 @@ module.exports = {
     const { userId } = req.params;
 
     try {
-      const userIndex = question.views.findIndex((user) => user === userId);
+      const userIndex = question.views.findIndex((user) => user.equals(userId));
 
       if (userIndex === -1) {
         question.views.push(userId);
