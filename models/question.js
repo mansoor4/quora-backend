@@ -24,7 +24,7 @@ const questionSchema = new mongoose.Schema(
 
     downVote: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
-    views: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    views: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
     comments: [{ type: commentSchema }],
 
