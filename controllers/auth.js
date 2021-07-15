@@ -54,8 +54,18 @@ module.exports = {
   signin: async (req, res, next) => {
     try {
       const { role } = req.query;
-      const { email } = req.body;
+      const { email, firebaseToken } = req.body;
       const user = await User.findOne({ email: email });
+
+      if (firebaseToken) {
+        const tokenIndex = user.tokens.findIndex(
+          (token) => token === firebaseToken
+        );
+        if (tokenIndex === -1) {
+          user.tokens.push(firebaseToken);
+          await user.save();
+        }
+      }
 
       let payload = {};
       if (role !== "admin") {

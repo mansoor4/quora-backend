@@ -17,8 +17,7 @@ const commentContentSchema = new mongoose.Schema({
 });
 const commentSchema = new mongoose.Schema(
   {
-    comment: { type: commentContentSchema },
-
+    commentContentSchema,
     replies: [{ type: commentContentSchema }],
   },
   { timestamps: true }

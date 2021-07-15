@@ -178,12 +178,9 @@ module.exports = {
         .populate({
           path: "comments",
           populate: {
-            path: "comment",
-            populate: {
-              path: "user",
-              model: User,
-              select: "name username profileImage.path",
-            },
+            path: "user",
+            model: User,
+            select: "name username profileImage.path",
           },
         })
         .populate({
@@ -254,11 +251,12 @@ module.exports = {
 
   addComment: async (req, res, next) => {
     const question = req.question;
-    const { text, userId } = req.body;
+    const { text, user } = req.body;
 
     try {
       const newComment = {
-        comment: { text, userId },
+        text,
+        user,
         replies: [],
       };
       question.comments.push(newComment);
@@ -274,10 +272,10 @@ module.exports = {
   addReply: async (req, res, next) => {
     const question = req.question;
     const { commentId } = req.params;
-    const { text, userId } = req.body;
+    const { text, user } = req.body;
 
     try {
-      const newReply = { text, userId };
+      const newReply = { text, user };
       const commentIndex = question.comments.findIndex((comment) =>
         comment._id.equals(commentId)
       );

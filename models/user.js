@@ -147,6 +147,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    tokens: [{ type: String }],
   },
   { timestamps: true }
 );
