@@ -1,4 +1,4 @@
-const Tag = require("../models/tag"),
+const Tag = require("../database/models/tag"),
   sanitizeTags = require("../utils/sanitizeTags");
 
 const tagSocket = (socket, io) => {

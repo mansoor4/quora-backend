@@ -7,9 +7,9 @@ const getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExclude
   getFileNamesFromBody = require("../utils/getFileNamesFromBody");
 
 //Import Models
-const User = require("../models/user"),
-  Question = require("../models/question"),
-  Answer = require("../models/answer");
+const User = require("../database/models/user"),
+  Question = require("../database/models/question"),
+  Answer = require("../database/models/answer");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete");
@@ -217,6 +217,154 @@ module.exports = {
 
       return res.json({
         message: "Vote updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  addComment: async (req, res, next) => {
+    const answer = req.answer;
+    const { text, user } = req.body;
+
+    try {
+      const newComment = {
+        user,
+        text,
+      };
+      answer.comments.push(newComment);
+
+      await answer.save();
+
+      return res.json({
+        message: "Comment successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  addReply: async (req, res, next) => {
+    const answer = req.answer;
+    const { commentId } = req.params;
+    const { text, user } = req.body;
+
+    try {
+      const newReply = { user, text };
+
+      const commentIndex = answer.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      if (commentIndex === -1) {
+        throw error("Comment not found", 404);
+      }
+
+      answer.comments[commentIndex].replies.push(newReply);
+
+      await answer.save();
+
+      return res.json({
+        message: "Replied successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  updateComment: async (req, res, next) => {
+    const answer = req.answer;
+    const { commentId } = req.params;
+    const { text } = req.body;
+
+    try {
+      const commentIndex = answer.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      answer.comments[commentIndex] = {
+        ...answer.comments[commentIndex],
+        text,
+      };
+
+      await answer.save();
+
+      return res.json({
+        message: "Comment update successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+
+  updateReply: async (req, res, next) => {
+    const answer = req.answer;
+    const { commentId, replyId } = req.params;
+    const { text } = req.body;
+
+    try {
+      const commentIndex = answer.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      if (commentIndex === -1) {
+        throw error("Comment not found", 404);
+      }
+
+      const replyIndex = answer.comments[commentIndex].replies.findIndex(
+        (reply) => reply._id.equals(replyId)
+      );
+
+      answer.comments[commentIndex].replies[replyIndex] = {
+        ...answer.comments[commentIndex].replies[replyIndex],
+        text,
+      };
+
+      await answer.save();
+
+      return res.json({
+        message: "Reply updated successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  deleteComment: async (req, res, next) => {
+    const answer = req.answer;
+    const { commentId } = req.params;
+
+    try {
+      answer.comments = answer.comments.filter(
+        (comment) => !comment._id.equals(commentId)
+      );
+
+      await answer.save();
+
+      return res.json({
+        message: "Comment deleted successfully",
+      });
+    } catch (err) {
+      return next(err);
+    }
+  },
+  deleteReply: async (req, res, next) => {
+    const answer = req.answer;
+    const { commentId, replyId } = req.params;
+    try {
+      const commentIndex = answer.comments.findIndex((comment) =>
+        comment._id.equals(commentId)
+      );
+
+      if (commentIndex === -1) {
+        throw error("Comment not found", 404);
+      }
+
+      answer.comments[commentIndex].replies = answer.comments[
+        commentIndex
+      ].replies.filter((reply) => !reply._id.equals(replyId));
+
+      await answer.save();
+
+      return res.json({
+        message: "Reply deleted successfully",
       });
     } catch (err) {
       return next(err);

@@ -7,9 +7,9 @@ const error = require("../utils/error"),
   sanitizeBookmarks = require("../utils/sanitizeBookmarks");
 
 //Import Models
-const User = require("../models/user"),
-  Question = require("../models/question"),
-  Answer = require("../models/answer");
+const User = require("../database/models/user"),
+  Question = require("../database/models/question"),
+  Answer = require("../database/models/answer");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete"),

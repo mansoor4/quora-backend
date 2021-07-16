@@ -35,4 +35,4 @@ const answerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Answer", answerSchema);
+module.exports = answerSchema;

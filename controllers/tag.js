@@ -1,6 +1,5 @@
-const User = require("../models/user"),
-  Tag = require("../models/tag"),
-  error = require("../utils/error");
+const User = require("../database/models/user"),
+  Tag = require("../database/models/tag");
 
 //Controllers
 module.exports = {

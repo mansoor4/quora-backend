@@ -1,5 +1,5 @@
 const error = require("../utils/error"),
-  Answer = require("../models/answer");
+  Answer = require("../database/models/answer");
 
 const questionUpdateAndDeleteValidation = async (req, res, next) => {
   try {

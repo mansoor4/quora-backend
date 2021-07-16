@@ -1,6 +1,6 @@
 const { isEmpty, isEmail, normalizeEmail, isLength } = require("validator"),
   error = require("../utils/error"),
-  User = require("../models/user");
+  User = require("../database/models/user");
 
 const signupValidation = async (req, res, next) => {
   try {

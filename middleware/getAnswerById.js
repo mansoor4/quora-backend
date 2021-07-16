@@ -1,4 +1,4 @@
-const Answer = require("../models/answer"),
+const Answer = require("../database/models/answer"),
   error = require("../utils/error");
 
 const getAnswerById = async (req, res, next, id) => {

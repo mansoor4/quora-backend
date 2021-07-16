@@ -1,6 +1,6 @@
 const { isEmpty, isEmail, normalizeEmail } = require("validator"),
   error = require("../utils/error"),
-  User = require("../models/user"),
+  User = require("../database/models/user"),
   { pbkdf2Sync } = require("crypto");
 
 const signinValidation = async (req, res, next) => {

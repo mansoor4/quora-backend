@@ -13,14 +13,4 @@ const chatContentSchema = new mongoose.Schema({
   },
 });
 
-const chatSchema = new mongoose.Schema({
-  messages: [
-    {
-      content: { type: chatContentSchema, required: true },
-
-      replyTo: { type: chatContentSchema, default: null },
-    },
-  ],
-});
-
-module.exports = mongoose.model("Chat", chatSchema);
+module.exports = chatContentSchema;

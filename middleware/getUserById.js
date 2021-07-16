@@ -1,4 +1,4 @@
-const User = require("../models/user"),
+const User = require("../database/models/user"),
   error = require("../utils/error"),
   {
     Types: { ObjectId },

@@ -1,5 +1,5 @@
 const error = require("../utils/error"),
-  User = require("../models/user");
+  User = require("../database/models/user");
 
 const removeQuestionAndAnswerFromBookmarkProcess = async ({ data }) => {
   try {

@@ -1,4 +1,4 @@
-const User = require("../models/user"),
+const User = require("../database/models/user"),
   { randomBytes, pbkdf2Sync } = require("crypto"),
   error = require("../utils/error"),
   jwt = require("jsonwebtoken"),
