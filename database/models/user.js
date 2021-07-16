@@ -13,7 +13,7 @@ environmentVariables();
 userSchema.statics.getTags = () => {
   return new Promise((resolve, reject) => {
     fs.readFile(
-      path.join(__dirname, "..", process.env.TAG_FILE_NAME),
+      path.join(__dirname, "..", "..", process.env.TAG_FILE_NAME),
       (err, data) => {
         if (err) {
           return reject(error("Tags file not found", 500));

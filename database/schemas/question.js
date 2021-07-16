@@ -38,4 +38,4 @@ const questionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.epxorts = questionSchema;
+module.exports = questionSchema;
