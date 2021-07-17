@@ -14,7 +14,7 @@ const { server, app } = require("./config/server.js");
 indexSocket();
 
 // Global Middlewares
-app.use((req, res, next) => {
+app.use((_, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-type,Authorization");
@@ -45,12 +45,12 @@ app.use("/api/answer", answerRoute);
 app.use("/api/tag", tagRoute);
 
 //Route Not Found
-app.use("/", (req, res, next) => {
+app.use("/", (__, _, next) => {
   return next(error("Api not found", 404));
 });
 
 //Error handler Middleware
-app.use("/", (error, req, res, next) => {
+app.use("/", (error, __, res, _) => {
   console.log(error);
   const message = error.message || "Something went wrong";
   const status = error.status || 500;

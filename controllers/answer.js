@@ -1,27 +1,28 @@
-//Import Packages
+//Import Models
+const User = require("../database/models/user"),
+  Question = require("../database/models/question"),
+  Answer = require("../database/models/answer");
 
 //Import Utils
 const getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
   deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
-  getFileNamesFromBody = require("../utils/getFileNamesFromBody");
-
-//Import Models
-const User = require("../database/models/user"),
-  Question = require("../database/models/question"),
-  Answer = require("../database/models/answer");
+  getFileNamesFromBody = require("../utils/getFileNamesFromBody"),
+  error = require("../utils/error");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete");
 
 module.exports = {
   createAnswer: async (req, res, next) => {
-    try {
-      const { body } = req.body;
-      const { userId, questionId } = req.params;
-      const user = req.profile;
-      const question = req.question;
+    const { body } = req.body;
+    const { userId, questionId } = req.params;
+    const user = req.profile;
+    const question = req.question;
+    const userAnswers = user.answers;
+    const questionAnswers = question.answers;
 
+    try {
       const updatedBody = deletePlaceholderFromBody(body);
 
       const answer = await Answer.create({
@@ -30,8 +31,8 @@ module.exports = {
         question: questionId,
       });
 
-      user.answers.push(answer);
-      question.answers.push(answer);
+      userAnswers.push(answer);
+      questionAnswers.push(answer);
 
       await user.save();
 

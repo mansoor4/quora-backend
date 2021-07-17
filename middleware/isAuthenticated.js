@@ -1,11 +1,16 @@
-const error = require("../utils/error"),
-  jwt = require("jsonwebtoken"),
-  environmentVariables = require("../config/environmentVariables");
+//Import Packages
+const jwt = require("jsonwebtoken");
+
+//Import Utils
+const error = require("../utils/error");
+
+//Import Configs
+environmentVariables = require("../config/environmentVariables");
 
 //Configure Environment variables
 environmentVariables();
 
-const isAuthenticated = (req, res, next) => {
+const isAuthenticated = (req, _, next) => {
   try {
     const authorization = req.get("Authorization");
     if (!authorization) {
@@ -19,7 +24,7 @@ const isAuthenticated = (req, res, next) => {
     if (!decode) {
       throw error("You are not Authorized", 400);
     }
-    req.userId = decode.id;
+
     return next();
   } catch (err) {
     return next(err);

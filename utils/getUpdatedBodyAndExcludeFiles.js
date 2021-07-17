@@ -1,3 +1,4 @@
+//Import Utils
 const getFileNamesFromBody = require("./getFileNamesFromBody");
 
 const getUpdatedBodyAndExcludeFiles = (multerFiles, body) => {
@@ -33,12 +34,12 @@ const getUpdatedBodyAndExcludeFiles = (multerFiles, body) => {
 
   let i = 0;
   const updatedBody = body.map((item) => {
-    if (item.insert) {
-      if (
-        item.insert.image &&
-        item.insert.image.indexOf(process.env.DOMAIN) == -1
-      ) {
-        item.insert.image =
+    const { insert } = item;
+    if (insert) {
+      const { image } = insert;
+
+      if (image && image.indexOf(process.env.DOMAIN) == -1) {
+        image =
           process.env.DOMAIN + "/api/getImage" + "/" + includedFilenames[i];
         i++;
       }

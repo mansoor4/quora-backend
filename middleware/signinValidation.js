@@ -1,9 +1,14 @@
+//Import Packages
 const { isEmpty, isEmail, normalizeEmail } = require("validator"),
-  error = require("../utils/error"),
-  User = require("../database/models/user"),
   { pbkdf2Sync } = require("crypto");
 
-const signinValidation = async (req, res, next) => {
+//Import Models
+const User = require("../database/models/user");
+
+//Import Utils
+const error = require("../utils/error");
+
+const signinValidation = async (req, _, next) => {
   try {
     //Trim Whitespaces From Field
     req.body.email = req.body.email.trim();
@@ -25,18 +30,23 @@ const signinValidation = async (req, res, next) => {
 
     //Password Validation
     const user = await User.findOne({ email: email });
+
     if (!user) {
       throw error("You are not register, goto signup and register", 422);
     }
+
     if (user.password === null) {
       throw error(
         "You are signin with google login, reset password to sign in without google login",
         422
       );
     }
+
+    const { salt } = user;
+
     const hashPassword = pbkdf2Sync(
       password,
-      user.salt,
+      salt,
       1000,
       64,
       `sha512`
@@ -47,7 +57,9 @@ const signinValidation = async (req, res, next) => {
     }
 
     if (role === "admin") {
-      if (!user.admin) {
+      const { admin } = user;
+
+      if (!admin) {
         throw error("You are not admin", 422);
       }
     }

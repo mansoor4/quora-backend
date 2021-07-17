@@ -1,7 +1,10 @@
-const error = require("../utils/error"),
-  Answer = require("../database/models/answer");
+//Import Models
+const Answer = require("../database/models/answer");
 
-const questionUpdateAndDeleteValidation = async (req, res, next) => {
+//Import Utils
+const error = require("../utils/error");
+
+const questionUpdateAndDeleteValidation = async (req, _, next) => {
   try {
     const question = req.question;
     const { mode } = req.query;

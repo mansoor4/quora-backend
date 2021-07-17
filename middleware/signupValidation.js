@@ -1,8 +1,13 @@
-const { isEmpty, isEmail, normalizeEmail, isLength } = require("validator"),
-  error = require("../utils/error"),
-  User = require("../database/models/user");
+//Import Packages
+const { isEmpty, isEmail, normalizeEmail, isLength } = require("validator");
 
-const signupValidation = async (req, res, next) => {
+//Import Models
+const User = require("../database/models/user");
+
+//Import Utils
+const error = require("../utils/error");
+
+const signupValidation = async (req, _, next) => {
   try {
     //Trim Whitespaces From Field
     req.body.name = req.body.name.trim();

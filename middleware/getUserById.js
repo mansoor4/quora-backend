@@ -1,10 +1,15 @@
-const User = require("../database/models/user"),
-  error = require("../utils/error"),
-  {
-    Types: { ObjectId },
-  } = require("mongoose");
+//Import Packages
+const {
+  Types: { ObjectId },
+} = require("mongoose");
+//Import Models
 
-const getUserById = async (req, res, next, id) => {
+const User = require("../database/models/user");
+
+//Import Utils
+const error = require("../utils/error");
+
+const getUserById = async (req, _, next, id) => {
   try {
     let isValid = false;
     if (ObjectId.isValid(id)) {
@@ -20,6 +25,7 @@ const getUserById = async (req, res, next, id) => {
       throw error("User not found", 404);
     }
     req.profile = user;
+
     return next();
   } catch (err) {
     return next(err);

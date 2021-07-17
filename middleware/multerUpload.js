@@ -1,6 +1,11 @@
-const upload = require("../config/multer"),
-  multer = require("multer"),
-  error = require("../utils/error");
+//Import Packages
+const multer = require("multer");
+
+//Import Utils
+const error = require("../utils/error");
+
+//Import Configs
+const upload = require("../config/multer");
 
 multerUpload = (req, res, next) => {
   upload.array("image")(req, res, (err) => {

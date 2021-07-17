@@ -1,5 +1,8 @@
-const error = require("../utils/error"),
-  User = require("../database/models/user");
+//Import Models
+const User = require("../database/models/user");
+
+//Import Utils
+const error = require("../utils/error");
 
 const answerDeleteFromUserProcess = async ({ data }) => {
   try {
@@ -15,9 +18,13 @@ const answerDeleteFromUserProcess = async ({ data }) => {
       const populatedAnswersIdsOfUser = populatedAnswerOfUser.map(
         (answer) => answer._id
       );
-      user.answers = populatedAnswersIdsOfUser;
+
+      let { answers } = user;
+
+      answers = populatedAnswersIdsOfUser;
 
       user.markModified("answers");
+
       const saveUser = await user.save();
       if (!saveUser) {
         throw error(

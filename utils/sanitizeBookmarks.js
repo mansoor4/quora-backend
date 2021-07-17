@@ -1,7 +1,9 @@
 const sanitizeBookmarks = (bookmarks) => {
   return bookmarks.filter((bookmark) => {
-    if (bookmark.question !== null) {
-      if (bookmark.answers.length) {
+    const { question, answers } = bookmark;
+
+    if (question !== null) {
+      if (answers.length) {
         return true;
       }
     }

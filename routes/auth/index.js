@@ -8,11 +8,9 @@ const middlewares = {
 };
 
 //Importing Auth Methods
-const authGet = require("./methods/get"),
-  authPost = require("./methods/post");
+const authPost = require("./methods/post");
 
 //Auth Methods
-authGet(router);
 authPost(router, middlewares);
 
 module.exports = router;

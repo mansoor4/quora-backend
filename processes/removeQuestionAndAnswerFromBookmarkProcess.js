@@ -1,5 +1,8 @@
-const error = require("../utils/error"),
-  User = require("../database/models/user");
+//Import Models
+const User = require("../database/models/user");
+
+//Import Utils
+const error = require("../utils/error");
 
 const removeQuestionAndAnswerFromBookmarkProcess = async ({ data }) => {
   try {
@@ -24,7 +27,10 @@ const removeQuestionAndAnswerFromBookmarkProcess = async ({ data }) => {
         throw error("User not found");
       }
 
-      user.bookmarks = sanitizedBookmarks;
+      let { bookmarks } = user;
+
+      bookmarks = sanitizedBookmarks;
+
       user.markModified("bookmarks");
       const saveUser = await user.save();
       if (!saveUser) {

@@ -1,10 +1,16 @@
+//Import Packages
 const mongoose = require("mongoose"),
   fs = require("fs"),
-  path = require("path"),
-  error = require("../../utils/error"),
-  environmentVariables = require("../../config/environmentVariables"),
+  path = require("path");
+
+//Import Utils
+const error = require("../../utils/error"),
   writeTagFile = require("../../utils/writeTagFile");
 
+//Configure Environment variables
+const environmentVariables = require("../../config/environmentVariables");
+
+//Import Schema
 const userSchema = require("../schemas/user");
 
 //Configure Environment variables
@@ -28,8 +34,11 @@ userSchema.statics.getTags = () => {
 userSchema.statics.addTags = (newTags) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { getTags } = userSchema.statics;
+      const { statics } = userSchema;
+      const { getTags } = statics;
+
       const tags = await getTags();
+
       const sanitizeTags = newTags.map((tag) =>
         tag
           .split(" ")
@@ -52,6 +61,7 @@ userSchema.statics.addTags = (newTags) => {
       const tagJson = JSON.stringify({ tags: concatedTags });
 
       const result = await writeTagFile(tagJson);
+
       if (result) {
         return resolve(true);
       }
@@ -64,8 +74,11 @@ userSchema.statics.addTags = (newTags) => {
 userSchema.statics.deleteTag = (tagName) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { getTags } = userSchema.statics;
+      const { statics } = userSchema;
+      const { getTags } = statics;
+
       const tags = await getTags();
+
       const filterTags = tags.filter((tag) => tag !== tagName);
       if (filterTags.length === tags.length) {
         throw error("Tag is not present", 422);
@@ -74,6 +87,7 @@ userSchema.statics.deleteTag = (tagName) => {
       const tagJson = JSON.stringify({ tags: filterTags });
 
       const result = await writeTagFile(tagJson);
+
       if (result) {
         return resolve(true);
       }

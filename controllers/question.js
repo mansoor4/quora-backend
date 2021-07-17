@@ -1,15 +1,14 @@
-//Import Packages
+//Import Models
+const User = require("../database/models/user"),
+  Question = require("../database/models/question"),
+  Answer = require("../database/models/answer");
 
 //Import Utils
 const getUpdatedBodyAndExcludeFiles = require("../utils/getUpdatedBodyAndExcludeFiles"),
   getUpdatedBodyAndImages = require("../utils/getUpdatedBodyAndImages"),
   deletePlaceholderFromBody = require("../utils/deletePlaceholderFromBody"),
-  getFileNamesFromBody = require("../utils/getFileNamesFromBody");
-
-//Import Models
-const User = require("../database/models/user"),
-  Question = require("../database/models/question"),
-  Answer = require("../database/models/answer");
+  getFileNamesFromBody = require("../utils/getFileNamesFromBody"),
+  error = require("../utils/error");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete");

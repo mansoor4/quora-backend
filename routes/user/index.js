@@ -13,8 +13,7 @@ const getUserById = require("../../middleware/getUserById");
 //Importing User Methods
 const userGet = require("./methods/get"),
   userPost = require("./methods/post"),
-  userPut = require("./methods/put"),
-  user_delete = require("./methods/_delete");
+  userPut = require("./methods/put");
 
 //Importing Bookmark Methods
 const bookmarkGet = require("./bookmark/methods/get"),
@@ -31,7 +30,6 @@ router.param("userId", getUserById);
 userGet(router, middlewares);
 userPost(router, middlewares);
 userPut(router, middlewares);
-user_delete(router, middlewares);
 
 //Bookmark Methods
 bookmarkGet(router, middlewares);

@@ -1,13 +1,17 @@
-const Answer = require("../database/models/answer"),
-  error = require("../utils/error");
+//Import Models
+const Answer = require("../database/models/answer");
 
-const getAnswerById = async (req, res, next, id) => {
+//Import Utils
+const error = require("../utils/error");
+
+const getAnswerById = async (req, _, next, id) => {
   try {
     const answer = await Answer.findOne({ _id: id });
     if (!answer) {
       throw error("Answer not found", 404);
     }
     req.answer = answer;
+
     return next();
   } catch (err) {
     return next(err);

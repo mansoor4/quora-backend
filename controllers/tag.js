@@ -1,9 +1,10 @@
+//Import Models
 const User = require("../database/models/user"),
   Tag = require("../database/models/tag");
 
 //Controllers
 module.exports = {
-  getAllTags: async (req, res, next) => {
+  getAllTags: async (_, res, next) => {
     try {
       const tags = await User.getTags();
       return res.json({
@@ -14,7 +15,7 @@ module.exports = {
     }
   },
 
-  getAllAdminTags: async (req, res, next) => {
+  getAllAdminTags: async (_, res, next) => {
     try {
       const tags = await Tag.find();
 

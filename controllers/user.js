@@ -1,15 +1,17 @@
 //Import Packages
 const _ = require("lodash");
 
-//Import Utils
-const error = require("../utils/error"),
-  environmentVariables = require("../config/environmentVariables"),
-  sanitizeBookmarks = require("../utils/sanitizeBookmarks");
-
 //Import Models
 const User = require("../database/models/user"),
   Question = require("../database/models/question"),
   Answer = require("../database/models/answer");
+
+//Import Utils
+const error = require("../utils/error"),
+  sanitizeBookmarks = require("../utils/sanitizeBookmarks");
+
+//Import Configs
+const environmentVariables = require("../config/environmentVariables");
 
 //Queues
 const imageDeleteQueue = require("../queues/imageDelete"),

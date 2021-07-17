@@ -1,9 +1,13 @@
-const User = require("../database/models/user"),
+//Import Packages
+const axios = require("axios"),
   { randomBytes, pbkdf2Sync } = require("crypto"),
-  error = require("../utils/error"),
-  jwt = require("jsonwebtoken"),
-  environmentVariables = require("../config/environmentVariables"),
-  axios = require("axios");
+  jwt = require("jsonwebtoken");
+
+//Import Models
+const User = require("../database/models/user");
+
+//Import Configs
+const environmentVariables = require("../config/environmentVariables");
 
 //Configure Environment variables
 environmentVariables();
@@ -40,11 +44,13 @@ module.exports = {
         tokens: [firebaseToken],
       });
 
-      const token = jwt.sign({ email: email }, process.env.SECRET);
+      const { _id } = user;
+
+      const jwtToken = jwt.sign({ email: email }, process.env.SECRET);
 
       return res.json({
-        token: token,
-        userId: user._id,
+        token: jwtToken,
+        userId: _id,
         profilePath: null,
         message: "Signup Successfully",
       });
@@ -58,12 +64,14 @@ module.exports = {
       const { email, firebaseToken } = req.body;
       const user = await User.findOne({ email: email });
 
+      const { profileCompleted, _id } = user;
+
       if (firebaseToken) {
-        const tokenIndex = user.tokens.findIndex(
-          (token) => token === firebaseToken
-        );
+        const { tokens } = user;
+        const tokenIndex = tokens.findIndex((token) => token === firebaseToken);
         if (tokenIndex === -1) {
-          user.tokens.push(firebaseToken);
+          tokens.push(firebaseToken);
+
           await user.save();
         }
       }
@@ -73,21 +81,21 @@ module.exports = {
         payload = { email: email };
       }
 
-      const token = jwt.sign(payload, process.env.SECRET);
+      const jwtToken = jwt.sign(payload, process.env.SECRET);
 
       let information = {};
 
       if (role !== "admin") {
         information = {
           profilePath: null,
-          profileCompleted: user.profileCompleted,
+          profileCompleted,
           message: "Signin Sucessfully",
         };
       }
 
       return res.json({
-        token: token,
-        userId: user._id,
+        token: jwtToken,
+        userId: _id,
         ...information,
       });
     } catch (err) {
@@ -124,26 +132,24 @@ module.exports = {
         });
       }
 
+      const { profileCompleted, _id } = user;
+
       if (firebaseToken) {
-        const tokenIndex = user.tokens.findIndex(
-          (token) => token === firebaseToken
-        );
+        const { tokens } = user;
+        const tokenIndex = tokens.findIndex((token) => token === firebaseToken);
         if (tokenIndex === -1) {
-          user.tokens.push(firebaseToken);
+          tokens.push(firebaseToken);
           await user.save();
         }
       }
 
-      const token = jwt.sign(
-        { id: user._id, email: email },
-        process.env.SECRET
-      );
+      const jwtToken = jwt.sign({ email: email }, process.env.SECRET);
 
       return res.json({
-        token: token,
-        userId: user._id,
+        token: jwtToken,
+        userId: _id,
         profilePath: picture,
-        profileCompleted: user.profileCompleted,
+        profileCompleted,
         message: "Signin Sucessfully",
       });
     } catch (err) {

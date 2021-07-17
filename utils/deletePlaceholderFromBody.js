@@ -1,7 +1,11 @@
 const deletePlaceholderFromBody = (body) => {
   const updatedBody = body.filter((item) => {
-    if (item.insert) {
-      return item.insert.image != process.env.IMAGE_PLACEHOLDER;
+    const { insert } = item;
+
+    if (insert) {
+      const { image } = insert;
+      
+      return image != process.env.IMAGE_PLACEHOLDER;
     }
     return false;
   });
